@@ -1,18 +1,7 @@
 //This is the main script for the bot. To start the bot, run this script with node
-try {
-	const Discord = require("discord.js");
-} catch (e){
-	console.log("Please run npm install and ensure it passes with no errors!");
-	process.exit();
-}
-
-try {
-	const discord_auth = require('./auth.json');
-} catch (e) {
-	console.log("Auth file not found!");
-}
-
-var botParameters = {
+const Discord = require("discord.js");
+const discord_auth = require('./auth.json');
+const botParameters = {
 	"localMode": (process.argv.indexOf("-l") != -1 || process.argv.indexOf("-local") != -1 ? true : false)
 }
 
@@ -21,10 +10,11 @@ if (botParameters.localMode) {
 }
 
 const bot = new Discord.Client();
+const landingPageId = "231894413276741652";
 
-var fs = require('fs');
-var Twitter = require('twitter');
-var child_process = require('child_process');
+const fs = require('fs');
+const Twitter = require('twitter');
+const child_process = require('child_process');
 
 //Custom modules
 var twitterBot = require('./nifty/twitter.js')(bot);
@@ -59,7 +49,7 @@ var getParameter = function(argument){
 	return argument.substring(argument.indexOf(' ')+1, argument.length);
 }
 
-var commands = {
+const commands = {
 	'!todo': {
 		//doing this NoSQL because yes.
 		process: (message, argument) => {
@@ -153,11 +143,11 @@ var commands = {
 		process: (message, argument) => {
 			if (bot.checkRole(message.author, message.server, 'Elder') || bot.checkRole(message.author, message.server, 'Head Scribe')) {
 				console.log("Being shut down by " + message.author.username);
-				message.channel.sendMessage("Beep boop, powering down.").then(function() {
+				message.channel.sendMessage("*Beep boop, click*").then(function() {
 					process.exit();
 				});
 			}  else {
-				message.channel.sendMessage("You don't have enough badges to train me!");
+				message.channel.sendMessage("Insufficient Privileges.");
 			}
 		},
 		description: "This kills the robot. Must have proper privileges to execute."
@@ -185,11 +175,9 @@ bot.on('ready', ()=> {
 })
 
 bot.on('message', function(msg){
-	// if not in local and 
+	// if not something the bot cares about, exit out
 	if(!msg.content.startsWith("!")&&botParameters.localMode||!msg.isMentioned(bot.user)&&!botParameters.localMode || msg.author.bot) return;
-	console.log(msg.member.roles);
-	//lastSeen.learn(message);
-	//if bot is mentioned
+
 	//Trim the mention from the message and any whitespace
 	var command = msg.content.substring(msg.content.indexOf("!"),msg.content.length).trim();
 	if (command.substring(0,1) === "!") {
@@ -201,6 +189,10 @@ bot.on('message', function(msg){
 			msg.channel.sendMessage("Unknown Command :(");
 		}
 	}
+})
+
+bot.on('guildMemberAdd', (guild, member) => {
+    guild.channels.get(landingPageId).sendMessage("*Static* State your business " + member +".");
 })
 
 //HTTP server stuff
