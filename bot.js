@@ -10,14 +10,15 @@ if (botParameters.localMode) {
 }
 
 const bot = new Discord.Client();
+//Brotherhood of Steel Discord server id
+const serverID= "231894413276741652"
+// `vault-door`'s id
 const landingPageId = "231894413276741652";
 
 const fs = require('fs');
-const Twitter = require('twitter');
 const child_process = require('child_process');
 
 //Custom modules
-var twitterBot = require('./nifty/twitter.js')(bot);
 var decider = require('./nifty/decisions.js')(bot);
 var gitHelper = require('./nifty/git.js')(bot);
 var lastSeen = require('./nifty/lastseen.js')(bot);
@@ -166,7 +167,7 @@ const commands = {
 	},
 	'!info': {
 		process: (message,argument) => {
-			let credits = "Eyebot was developed with love by the Scribes and Elder of the Brotherhood of Steel"
+			let credits = "```This Eyebot unit has been repurposed by Elder McNamara to serve the Brotherhood of Steel.```"
 			message.channel.sendMessage(credits);
 		}
 	}
@@ -180,8 +181,13 @@ bot.on('ready', ()=> {
 })
 
 bot.on('message', function(msg){
+	//msg.guild.roles.find("name", "Initiate").id
 	// if not something the bot cares about, exit out
 	if(!msg.content.startsWith("!")&&botParameters.localMode||!msg.isMentioned(bot.user)&&!botParameters.localMode || msg.author.bot) return;
+	if (msg.member.highestRole.name === "@everyone" && msg.content === "!join") {
+		console.log("Yo");
+		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id);
+	}
 
 	//Trim the mention from the message and any whitespace
 	var command = msg.content.substring(msg.content.indexOf("!"),msg.content.length).trim();
@@ -198,22 +204,22 @@ bot.on('message', function(msg){
 
 bot.on('guildMemberAdd', (guild, member) => {
     guild.channels.get(landingPageId).sendMessage("Wastelander spotted in the area! " + member);
-    member.sendMessage("*CCCSSSHHH* Hello Wastelander. This Eyebot is property of The Brotherhood of Steel. We are looking for new recruits such as yourself. If you are interested in joining, please confirm onscreen. ```diff\n + say '!join'\n```")
+    member.sendMessage("`\"*CCCSSSHHH* Hello Wastelander. This Eyebot is property of The Brotherhood of Steel. We are looking for new recruits such as yourself. If you are interested in joining, please confirm onscreen.\"` ```diff\n + say '!join'\n```")
 })
 
-//HTTP server stuff
-var http = require('http');
-var express = require('express');
-var app = express();
-var port = 3030;		
+// //HTTP server stuff
+// var http = require('http');
+// var express = require('express');
+// var app = express();
+// var port = 3030;		
 
-app.get('/', function(req,res) {
-	console.log("Heard the boop");
-	res.send("Hello World");
-})
+// app.get('/', function(req,res) {
+// 	console.log("Heard the boop");
+// 	res.send("Hello World");
+// })
 
-app.listen(port, function(){
-	console.log("Listening on port: " + port);
-})
+// app.listen(port, function(){
+// 	console.log("Listening on port: " + port);
+// })
 
 module.exports = bot;

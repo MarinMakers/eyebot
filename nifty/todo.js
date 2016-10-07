@@ -47,10 +47,10 @@ var remove = function(ids, message, messageFunction){
 				found = true;
 				if (singleTask.user == message.author.name || singleTask.complete){
 					listFile.tasks.splice(task, 1);
-					messageFunction(message.author+": Entry " + idArr[id] + " removed successfully!");
+					messageFunction(message.author+": Entry " + idArr[id] + " removed.");
 					break;
 				} else{
-					messageFunction("Sorry, you do not have privileges for entry " + idArr[id]);
+					messageFunction("You do not have privileges for entry " + idArr[id]);
 					break;
 				}
 			}
@@ -67,7 +67,7 @@ var complete = function(completeId, message, messageFunction){
 	for (task in listFile.tasks){
 		if (listFile.tasks[task].channel === message.channel.name && listFile.tasks[task].idOnChannel === completeId){
 			listFile.tasks[task].complete = true;
-			messageFunction(message.author+": Entry " + completeId + " has been completed! Woo!!");
+			messageFunction(message.author+": Entry " + completeId + " has been completed.");
 			break;
 		}
 	}
