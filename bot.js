@@ -71,7 +71,7 @@ const commands = {
 				todo.complete(id, message, messageFunction);
 				// complete tasks
 			}  else if (method === "export") {
-				todo.exportList(message, messageFunction,bot);
+				todo.exportList(message, messageFunction);
 			}  else{
 				todo.showTasks(message, messageFunction);
 			}
@@ -108,6 +108,7 @@ const commands = {
 		process: (message, argument) => {
 			message.author.sendMessage("Available Commands: ", function() {
 				for (var cmd in commands) {
+					console.log(cmd);
 					var info = cmd;
 					var usage = commands[cmd].usage;
 					if (usage) {
@@ -152,18 +153,22 @@ const commands = {
 		},
 		description: "This kills the robot. Must have proper privileges to execute."
 	},
-	'!w2g': {
-		process: (message, argument) => {
-			var watch2getherUrl = "https://www.watch2gether.com/go#" + getParameter(argument);
-			message.channel.sendMessage("watch2gether link: " + watch2getherUrl);
-		},
-		description: "Create a watch2gether.com lobby"
-	},
 	'!task': {
 		process: (message, argument) => {
 			commands["!todo"].process(message,argument)
 		},
 		description: "Alias for !todo"
+	},
+	'!join': {
+		process: (message,argument) => {
+
+		}
+	},
+	'!info': {
+		process: (message,argument) => {
+			let credits = "Eyebot was developed with love by the Scribes and Elder of the Brotherhood of Steel"
+			message.channel.sendMessage(credits);
+		}
 	}
 }
 
@@ -192,7 +197,8 @@ bot.on('message', function(msg){
 })
 
 bot.on('guildMemberAdd', (guild, member) => {
-    guild.channels.get(landingPageId).sendMessage("*Static* State your business " + member +".");
+    guild.channels.get(landingPageId).sendMessage("Wastelander spotted in the area! " + member);
+    member.sendMessage("*CCCSSSHHH* Hello Wastelander. This Eyebot is property of The Brotherhood of Steel. We are looking for new recruits such as yourself. If you are interested in joining, please confirm onscreen. ```diff\n + say '!join'\n```")
 })
 
 //HTTP server stuff
