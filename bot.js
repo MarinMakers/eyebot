@@ -21,7 +21,6 @@ const child_process = require('child_process');
 //Custom modules
 var decider = require('./nifty/decisions.js')(bot);
 var gitHelper = require('./nifty/git.js')(bot);
-var lastSeen = require('./nifty/lastseen.js')(bot);
 var todo = require('./nifty/todo.js')(bot);
 
 //initialize the twitterClient variable, but don't give it a value
