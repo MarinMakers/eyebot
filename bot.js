@@ -19,7 +19,7 @@ const fs = require('fs');
 const child_process = require('child_process');
 
 //Custom modules
-var decider = require('./nifty/decisions.js')(bot);
+var decider = require('./nifty/decisions.js')(bot); 
 var gitHelper = require('./nifty/git.js')(bot);
 var todo = require('./nifty/todo.js')(bot);
 
@@ -203,7 +203,7 @@ bot.on('message', function(msg){
 
 bot.on('guildMemberAdd', (guild, member) => {
     guild.channels.get(landingPageId).sendMessage("Wastelander spotted in the area! " + member);
-    member.sendMessage("`\"*CCCSSSHHH* Hello Wastelander. This Eyebot is property of The Brotherhood of Steel. We are looking for new recruits such as yourself. If you are interested in joining, please confirm onscreen.\"` ```diff\n + say '!join'\n```")
+    member.sendMessage("```diff\n==BEGIN TRANSMISSION==\n\n\"This is Elder McNamara of the Brotherhood of Steel. The Brotherhood is looking for able-bodied recruits that want to take part in restoring order to America. If this is you, confirm onscreen and make your way to the map location.\"\n\n+\t> ACCEPT (say '!join')\n+\t> DECLINE```")
 })
 
 // //HTTP server stuff
