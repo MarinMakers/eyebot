@@ -31,7 +31,7 @@ bot.checkRole = (user, server, role) => {
 var getMethod = (argument) => {
 	//Grab first word in a command
 	if(argument.indexOf(' ') != -1){
-		return argument.substring(0, argument.indexOf(' '));
+		return argument.split(' ')[0];
 	}else{
 		return argument;
 	}
@@ -178,7 +178,7 @@ const commands = {
 	'play': {
 		process: (msg) => {
 			if (queue[msg.guild.id] === undefined) return msg.channel.sendMessage(`Add some songs to the queue first with !add`);
-			if (!msg.guild.voiceConnection) return commands[prefix+'join'].proceess(msg).then(() => commands[prefix+'play'].process(msg));
+			if (!msg.guild.voiceConnection) return commands['join'].process(msg).then(() => commands['play'].process(msg));
 			if (queue[msg.guild.id].playing) return msg.channel.sendMessage('Already Playing');
 			let dispatcher;
 			queue[msg.guild.id].playing = true;
