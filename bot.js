@@ -288,16 +288,12 @@ bot.on('ready', ()=> {
 
 bot.on('message', (msg) => {
 	if (msg.content === "!enlist") {
-		console.log("tried to join via PM");
+		console.log(msg.author.username + ' tried to join via PM');
+		return;
 	}
 	//msg.guild.roles.find("name", "Initiate").id
 	// if not something the bot cares about, exit out
 	if(!msg.content.startsWith(prefix) || msg.author.bot) return;
-	
-	if (msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
-		console.log("Yo");
-		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id);
-	}
 
 	//Trim the mention from the message and any whitespace
 	console.log(msg.content);
