@@ -113,8 +113,7 @@ const commands = {
 			message.channel.sendMessage(message.author + " pong!");
 			console.log(message.author.username);
 		},
-		description: "Check if the bot is online.",
-		discrete:true
+		description: "Check if the bot is online."
 	},
 	'pull': {
 		process: (message, argument) => {
@@ -126,7 +125,8 @@ const commands = {
 				message.channel.sendMessage("You don't have enough badges to train me!");
 			}
 		},
-		description: "Pulls the bot's code from github on to the server. You must have the role 'developer' to use this functionality."
+		description: "Pulls the bot's code from github on to the server. You must have the role 'developer' to use this functionality.",
+		discrete:true
 	},
 	'help': {
 		process: (message, argument) => {
@@ -177,7 +177,8 @@ const commands = {
 				message.channel.sendMessage("Insufficient Privileges.");
 			}
 		},
-		description: "This kills the robot. Must have privileges to execute."
+		description: "This kills the robot. Must have privileges to execute.",
+		discrete: true
 	},
 	'task': {
 		process: (message, argument) => {
@@ -248,6 +249,7 @@ const commands = {
 				});
 			})(queue[msg.guild.id].songs[0]);
 		}
+		description: "Make Musicbot play the song queue in current voice channel."
 	},
 	'join': {
 		process: (msg) => {
@@ -270,7 +272,7 @@ const commands = {
 				msg.channel.sendMessage(`added **${info.title}** to the queue`);
 			});
 		},
-		description: "Add youtube link to queue."
+		description: "Add youtube link to music queue."
 	},
 	'queue': {
 		process: (msg) => {
