@@ -303,8 +303,6 @@ bot.on('message', (msg) => {
 		var argument = command.substring(command.indexOf(' ')+1, command.length);
 		if (commands[to_execute]) {
 			commands[to_execute].process(msg, argument)
-		}  else {
-			msg.channel.sendMessage("Unknown Command :(");
 		}
 	}
 })
