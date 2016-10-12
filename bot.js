@@ -107,7 +107,7 @@ const commands = {
 					commandList+=command+"\n";
 				}
 			}
-			commandList += data.musicPanel;
+			commandList += "```"+ data.musicPanel;
 			message.author.sendMessage(commandList)
 		},
 		description: "Messages user list of commands"
@@ -177,7 +177,7 @@ const commands = {
 	},
 	'play': {
 		process: (msg) => {
-			if (queue[msg.guild.id] === undefined) return msg.channel.sendMessage(`Add some songs to the queue first with ${prefix}add`);
+			if (queue[msg.guild.id] === undefined) return msg.channel.sendMessage(`Add some songs to the queue first with !add`);
 			if (!msg.guild.voiceConnection) return commands[prefix+'join'].proceess(msg).then(() => commands[prefix+'play'].process(msg));
 			if (queue[msg.guild.id].playing) return msg.channel.sendMessage('Already Playing');
 			let dispatcher;
@@ -241,7 +241,7 @@ const commands = {
 	'add': {
 		process: (msg) => {
 			let url = msg.content.split(' ')[1];
-			if (url == '' || url === undefined) return msg.channel.sendMessage(`You must add a url, or youtube video id after ${prefix}add`);
+			if (url == '' || url === undefined) return msg.channel.sendMessage(`You must add a url, or youtube video id after !add`);
 			yt.getInfo(url, (err, info) => {
 				if(err) return msg.channel.sendMessage('Invalid YouTube Link: ' + err);
 				if (!queue.hasOwnProperty(msg.guild.id)) queue[msg.guild.id] = {}, queue[msg.guild.id].playing = false, queue[msg.guild.id].songs = [];
@@ -253,7 +253,7 @@ const commands = {
 	},
 	'queue': {
 		process: (msg) => {
-			if (queue[msg.guild.id] === undefined) return msg.channel.sendMessage(`Add some songs to the queue first with ${prefix}add`);
+			if (queue[msg.guild.id] === undefined) return msg.channel.sendMessage(`Add some songs to the queue first with !add`);
 			let tosend = [];
 			queue[msg.guild.id].songs.forEach((song, i) => { tosend.push(`${i+1}. ${song.title} - Requested by: ${song.requester}`);});
 			msg.channel.sendMessage(`__**${msg.guild.name}'s Music Queue:**__ Currently **${tosend.length}** songs queued ${(tosend.length > 15 ? '*[Only next 15 shown]*' : '')}\n\`\`\`${tosend.slice(0,15).join('\n')}\`\`\``);
@@ -273,7 +273,15 @@ bot.on('message', (msg) => {
 	// if not something the bot cares about, exit out
 
 	if (msg.channel.type != 'dm' && msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
-		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then(msg.channel.sendMessage("Welcome, Initiate.")).catch(console.log("Unable to assign role to Intitiate"));
+		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
+			msg.member.setNickname("Initiate "+ msg.author.username).then((value) => {
+				msg.channel.sendMessage("Welcome, Initiate.");
+			}, (reason) => {
+				console.log(reason);
+			});
+		}, (reason) => {
+			console.log(reason);
+		});
 	};
 
 	if(!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === 'dm' || msg.channel.type != 'dm' && data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1) return;
@@ -290,8 +298,8 @@ bot.on('message', (msg) => {
 })
 
 bot.on('guildMemberAdd', (guild, member) => {
-    guild.channels.get(landingPageId).sendMessage("Wastelander spotted in the area! " + member);
-    member.sendMessage(data.motd)
+    guild.channels.get(data.vaultDoorID).sendMessage("Wastelander spotted in the area! " + member);
+    member.sendMessage(data.motd);
 })
 
 // //HTTP server stuff

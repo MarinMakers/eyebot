@@ -1,8 +1,8 @@
 {
 	"serverID":"231894413276741652",
-	"vault-doorID":"231894413276741652",
+	"vaultDoorID":"231894413276741652",
 	"prefix":"!",
-	"motd": "```diff\n==BEGIN TRANSMISSION==\n\n\"This is Elder McNamara of the Brotherhood of Steel. \nThe Brotherhood is looking for able-bodied recruits that want to take part in restoring order to the Wasteland. If this is you, confirm onscreen and make your way to the map location.\"\n+\t> ACCEPT (say '!enlist' in vault-door)\n+\t> DECLINE```",
-	"musicPanel": "Music Controls:```xl\n${prefix}join : Join Voice channel of msg sender\n${prefix}add : Add a valid youtube link to the queue\n${prefix}queue : Shows the current queue, up to 15 songs shown\n${prefix}play : Play the music queue if already joined to a voice channel \n```The following commands only function while the play command is running:```xl\n${prefix}pause : pauses the music\n${prefix}resume : resumes the music\n${prefix}skip : skips the playing song\n${prefix}time : Shows the playtime of the song.\n${prefix}volume+(+++) : increases volume by 2%/+\n${prefix}volume-(---) : decreases volume by 2%/-\n```",
+	"motd": "```diff\n==BEGIN TRANSMISSION==\n\n\"This is Elder McNamara of the Brotherhood of Steel... The Brotherhood is looking for able-bodied recruits that want to take part in restoring order to the Wasteland. If this is you, confirm onscreen and make your way to the map location. This message repeats itself.\"\n+  > ACCEPT (say '!enlist' in vault-door)\n+  > DECLINE```",
+	"musicPanel": "Music Controls:```xl\n!join : Join Voice channel of msg sender\n!add : Add a valid youtube link to the queue\n!queue : Shows the current queue, up to 15 songs shown\n!play : Play the music queue if already joined to a voice channel \n```The following commands only function while the play command is running:```xl\n!pause : pauses the music\n!resume : resumes the music\n!skip : skips the playing song\n!time : Shows the playtime of the song.\n!volume+(+++) : increases volume by 2%/+\n!volume-(---) : decreases volume by 2%/-\n```",
 	"blacklistedRoles":["@everyone", "Initiate"]
 }
