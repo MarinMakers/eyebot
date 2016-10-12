@@ -13,17 +13,17 @@ const
 	prefix = "!",
 	// Greeting Message
 	motd = `
-		\`\`\`diff
-			\n==BEGIN TRANSMISSION==
-			\n
-			\n
-			"This is Elder McNamara of the Brotherhood of Steel. The Brotherhood is looking for able-bodied recruits that want to take part in restoring order to the Wasteland. If this is you, confirm onscreen and make your way to the map location."
-			\n
-			\n
-			+\t> ACCEPT (say '!enlist')\n
-			+\t> DECLINE
-		\`\`\`
-	`,
+\`\`\`diff
+\n==BEGIN TRANSMISSION==
+\n
+\n
+"This is Elder McNamara of the Brotherhood of Steel. 
+The Brotherhood is looking for able-bodied recruits that want to take part in restoring order to the Wasteland. If this is you, confirm onscreen and make your way to the map location."
+\n
++\t> ACCEPT (say '!enlist' in vault-door)\n
++\t> DECLINE
+\`\`\`
+`,
 	// Credits
 	credits = "```This Eyebot unit has been repurposed by Elder McNamara to serve the Brotherhood of Steel.```",
 	// Detailed info on Music Bot
@@ -185,7 +185,7 @@ const commands = {
 		process: (message,argument) => {
 
 		},
-		description: "Join the Brotherhood of Steel as an Initiate."
+		description: "Join the Brotherhood of Steel."
 	},
 	'info': {
 		process: (message,argument) => {
@@ -287,16 +287,15 @@ bot.on('ready', ()=> {
 })
 
 bot.on('message', (msg) => {
-	if (msg.content === "!enlist") {
-		console.log(msg.author.username + ' tried to join via PM');
-		return;
-	}
-	//msg.guild.roles.find("name", "Initiate").id
 	// if not something the bot cares about, exit out
-	if(!msg.content.startsWith(prefix) || msg.author.bot) return;
+
+	if (msg.channel.type != 'dm' && msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
+		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then(msg.channel.sendMessage("Welcome, Initiate.")).catch(console.log);
+	};
+
+	if(!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === 'dm' || msg.channel.type != 'dm' && msg.member.highestRole.name === '@everyone') return;
 
 	//Trim the mention from the message and any whitespace
-	console.log(msg.content);
 	var command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
 	if (command.startsWith(prefix)) {
 		var to_execute = command.split(prefix).pop().split(' ')[0];
