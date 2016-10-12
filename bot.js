@@ -154,6 +154,21 @@ const commands = {
 		},
 		description: "Join the Brotherhood of Steel."
 	},
+	'propaganda': {
+		process: (message,argument) => {
+			fs.readdir('./assets/images', (err, files) => {
+				if (err) {
+					message.channel.sendMessage("No assets found.")
+				}  else {
+					files = files.filter((file)=> {
+						return file.substring(0,1) != '.';
+					});
+					console.log(files);
+					message.channel.sendFile('assets/images/'+ files[Math.floor(Math.random()*files.length)]);
+				}
+			})
+		}
+	},
 	'info': {
 		process: (message,argument) => {
 			message.channel.sendMessage(credits);
