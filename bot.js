@@ -4,46 +4,8 @@ const discord_auth = require('./auth.json');
 
 const bot = new Discord.Client();
 
-const
-	//Brotherhood of Steel Discord server id
-	serverID= "231894413276741652",
-	// `vault-door`'s id
-	landingPageId = "231894413276741652",
-	// Bot's trigger character
-	prefix = "!",
-	// Greeting Message
-	motd = `
-\`\`\`diff
-\n==BEGIN TRANSMISSION==
-\n
-\n
-"This is Elder McNamara of the Brotherhood of Steel. 
-The Brotherhood is looking for able-bodied recruits that want to take part in restoring order to the Wasteland. If this is you, confirm onscreen and make your way to the map location."
-\n
-+\t> ACCEPT (say '!enlist' in vault-door)\n
-+\t> DECLINE
-\`\`\`
-`,
-	// Credits
-	credits = "```This Eyebot unit has been repurposed by Elder McNamara to serve the Brotherhood of Steel.```",
-	// Detailed info on Music Bot
-	musicPanel = `\`\`\`Music Controls:\`\`\`xl
-${prefix}join : Join Voice channel of msg sender
-${prefix}add : Add a valid youtube link to the queue
-${prefix}queue : Shows the current queue, up to 15 songs shown
-${prefix}play : Play the music queue if already joined to a voice channel 
-\`\`\`
-The following commands only function while the play command is running:
-\`\`\`xl
-${prefix}pause : pauses the music
-${prefix}resume : resumes the music
-${prefix}skip : skips the playing song
-${prefix}time : Shows the playtime of the song.	
-${prefix}volume+(+++) : increases volume by 2%/+
-${prefix}volume-(---) : decreases volume by 2%/-
-\`\`\`
-`, 
-	blacklistedRoles = ['@everyone','Initiate'];
+const data = require('./data.json');
+const prefix = data.prefix;
 
 let queue = {};
 
@@ -145,7 +107,7 @@ const commands = {
 					commandList+=command+"\n";
 				}
 			}
-			commandList += musicPanel;
+			commandList += data.musicPanel;
 			message.author.sendMessage(commandList)
 		},
 		description: "Messages user list of commands"
@@ -248,7 +210,7 @@ const commands = {
 					});
 				});
 			})(queue[msg.guild.id].songs[0]);
-		}
+		},
 		description: "Make Musicbot play the song queue in current voice channel."
 	},
 	'join': {
@@ -296,10 +258,10 @@ bot.on('message', (msg) => {
 	// if not something the bot cares about, exit out
 
 	if (msg.channel.type != 'dm' && msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
-		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then(msg.channel.sendMessage("Welcome, Initiate.")).catch(console.log);
+		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then(msg.channel.sendMessage("Welcome, Initiate.")).catch(console.log("Unable to assign role to Intitiate"));
 	};
 
-	if(!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === 'dm' || msg.channel.type != 'dm' && blacklistedRoles.indexOf(msg.member.highestRole.name) != -1) return;
+	if(!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === 'dm' || msg.channel.type != 'dm' && data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1) return;
 
 	//Trim the mention from the message and any whitespace
 	var command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
@@ -314,7 +276,7 @@ bot.on('message', (msg) => {
 
 bot.on('guildMemberAdd', (guild, member) => {
     guild.channels.get(landingPageId).sendMessage("Wastelander spotted in the area! " + member);
-    member.sendMessage(motd)
+    member.sendMessage(data.motd)
 })
 
 // //HTTP server stuff
