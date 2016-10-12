@@ -10,24 +10,30 @@ if (botParameters.localMode) {
 }
 
 const bot = new Discord.Client();
-//Brotherhood of Steel Discord server id
-const serverID= "231894413276741652"
-// `vault-door`'s id
-const landingPageId = "231894413276741652";
+
+const
+	//Brotherhood of Steel Discord server id
+	serverID= "231894413276741652",
+	// `vault-door`'s id
+	landingPageId = "231894413276741652",
+	// Bot's trigger character
+	prefix = "!",
+	// Greeting Message
+	motd = "```diff\n==BEGIN TRANSMISSION==\n\n\"This is Elder McNamara of the Brotherhood of Steel. The Brotherhood is looking for able-bodied recruits that want to take part in restoring order to the Wasteland. If this is you, confirm onscreen and make your way to the map location.\"\n\n+\t> ACCEPT (say '!join')\n+\t> DECLINE```",
+	// Credits
+	credits = "```This Eyebot unit has been repurposed by Elder McNamara to serve the Brotherhood of Steel.```"
+
 
 const fs = require('fs');
 const child_process = require('child_process');
 
 //Custom modules
-var decider = require('./nifty/decisions.js')(bot); 
-var gitHelper = require('./nifty/git.js')(bot);
-var todo = require('./nifty/todo.js')(bot);
-
-//initialize the twitterClient variable, but don't give it a value
-var twitterClient;
+const decider = require('./nifty/decisions.js')(bot); 
+const gitHelper = require('./nifty/git.js')(bot);
+const todo = require('./nifty/todo.js')(bot);
 
 //call checkRole(message.sender, message.server, 'role')
-bot.checkRole = function(user, server, role){
+bot.checkRole = (user, server, role) => {
 	for (var i = 0; i < server.roles.length; i++){
 		if(server.roles[i].name == role && user.hasRole(server.roles[i])){
 			return true;
@@ -36,7 +42,7 @@ bot.checkRole = function(user, server, role){
 	return false;
 }
 
-var getMethod = function(argument){
+var getMethod = (argument) => {
 	//Grab first word in a command
 	if(argument.indexOf(' ') != -1){
 		return argument.substring(0, argument.indexOf(' '));
@@ -45,16 +51,15 @@ var getMethod = function(argument){
 	}
 }
 
-var getParameter = function(argument){
+var getParameter = (argument) => {
 	return argument.substring(argument.indexOf(' ')+1, argument.length);
 }
 
 const commands = {
 	'!todo': {
-		//doing this NoSQL because yes.
 		process: (message, argument) => {
-
-			var messageFunction = function(msg){
+			// Get rid of this at some point
+			var messageFunction = (msg) => {
 				message.channel.sendMessage(msg);
 			}
 
@@ -82,20 +87,14 @@ const commands = {
 	'!ping': {
 		process: (message, argument) => {
 			message.channel.sendMessage(message.author + " pong!");
-			console.log(message.author);
+			console.log(message.author.username);
 		},
-		description: "dumps info on the user to the console of the server."
-	},
-	'!tableflip': {
-		process: (message,argument) => {
-			message.channel.sendMessage("(╯°□°）╯︵ ┻━┻");
-		},
-		description: "Flip a table out of frustration."
+		description: "Check if the bot is online."
 	},
 	'!pull': {
 		process: (message, argument) => {
 			if (bot.checkRole(message.author, message.server, 'developer')){
-				gitHelper.pull(function(msg){
+				gitHelper.pull((msg) => {
 					message.channel.sendMessage(msg);
 				})
 			}else{
@@ -106,27 +105,26 @@ const commands = {
 	},
 	'!help': {
 		process: (message, argument) => {
-			message.author.sendMessage("Available Commands: ", function() {
-				for (var cmd in commands) {
-					console.log(cmd);
-					var info = cmd;
-					var usage = commands[cmd].usage;
-					if (usage) {
-						info += " " + usage;
-					}
-					var description = commands[cmd].description;
-					if(description){
-						info += "\n\t" + description;
-					}
-					message.author.sendMessage(info);
+			let commandList = '```'
+			for (cmd in commands) {
+				let command = cmd;
+				let usage = commands[cmd].usage;
+				if (usage) {
+					command += " " + usage;
 				}
-			})
+				let description = commands[cmd].description;
+				if(description){
+					command += "\n\t" + description;
+				}
+				commandList+=command+"\n";
+			}
+			message.author.sendMessage(commandList+'```')
 		},
-		description: "PM's users a list of commands and invocation"
+		description: "PM's user a list of commands"
 	},
 	'!roll': {
 		process: (message, argument) => {
-			decider.rollDice(argument, function(result){
+			decider.rollDice(argument, (result) => {
 				message.channel.sendMessage(result)
 			})
 		},
@@ -144,14 +142,14 @@ const commands = {
 		process: (message, argument) => {
 			if (bot.checkRole(message.author, message.server, 'Elder') || bot.checkRole(message.author, message.server, 'Head Scribe')) {
 				console.log("Being shut down by " + message.author.username);
-				message.channel.sendMessage("*Beep boop, click*").then(function() {
+				message.channel.sendMessage("*Beep boop, click*").then(()=> {
 					process.exit();
 				});
 			}  else {
 				message.channel.sendMessage("Insufficient Privileges.");
 			}
 		},
-		description: "This kills the robot. Must have proper privileges to execute."
+		description: "This kills the robot. Must have privileges to execute."
 	},
 	'!task': {
 		process: (message, argument) => {
@@ -162,13 +160,14 @@ const commands = {
 	'!join': {
 		process: (message,argument) => {
 
-		}
+		},
+		description: "Join the Brotherhood of Steel as an Initiate."
 	},
 	'!info': {
 		process: (message,argument) => {
-			let credits = "```This Eyebot unit has been repurposed by Elder McNamara to serve the Brotherhood of Steel.```"
 			message.channel.sendMessage(credits);
-		}
+		},
+		description: "Credits for the bot."
 	}
 }
 
@@ -179,18 +178,22 @@ bot.on('ready', ()=> {
 	console.log("Eyebot Online")
 })
 
-bot.on('message', function(msg){
+bot.on('message', (msg) => {
+	if (msg.content === "!join") {
+		console.log("tried to join via PM");
+	}
 	//msg.guild.roles.find("name", "Initiate").id
 	// if not something the bot cares about, exit out
-	if(!msg.content.startsWith("!")&&botParameters.localMode||!msg.isMentioned(bot.user)&&!botParameters.localMode || msg.author.bot) return;
+	if(!msg.content.startsWith(prefix)&&botParameters.localMode||!msg.isMentioned(bot.user)&&!botParameters.localMode || msg.author.bot) return;
+	
 	if (msg.member.highestRole.name === "@everyone" && msg.content === "!join") {
 		console.log("Yo");
 		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id);
 	}
 
 	//Trim the mention from the message and any whitespace
-	var command = msg.content.substring(msg.content.indexOf("!"),msg.content.length).trim();
-	if (command.substring(0,1) === "!") {
+	var command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
+	if (command.startsWith(prefix)) {
 		var to_execute = command.split(' ')[0];
 		var argument = command.substring(command.indexOf(' ')+1, command.length);
 		if (commands[to_execute]) {
@@ -203,7 +206,7 @@ bot.on('message', function(msg){
 
 bot.on('guildMemberAdd', (guild, member) => {
     guild.channels.get(landingPageId).sendMessage("Wastelander spotted in the area! " + member);
-    member.sendMessage("```diff\n==BEGIN TRANSMISSION==\n\n\"This is Elder McNamara of the Brotherhood of Steel. The Brotherhood is looking for able-bodied recruits that want to take part in restoring order to America. If this is you, confirm onscreen and make your way to the map location.\"\n\n+\t> ACCEPT (say '!join')\n+\t> DECLINE```")
+    member.sendMessage(motd)
 })
 
 // //HTTP server stuff
