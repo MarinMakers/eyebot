@@ -113,7 +113,8 @@ const commands = {
 			message.channel.sendMessage(message.author + " pong!");
 			console.log(message.author.username);
 		},
-		description: "Check if the bot is online."
+		description: "Check if the bot is online.",
+		discrete:true
 	},
 	'pull': {
 		process: (message, argument) => {
@@ -131,16 +132,18 @@ const commands = {
 		process: (message, argument) => {
 			let commandList = 'Available Commands:```'
 			for (cmd in commands) {
-				let command = prefix + cmd;
-				let usage = commands[cmd].usage;
-				if (usage) {
-					command += " " + usage;
+				if (!commands[cmd].discrete) {
+					let command = prefix + cmd;
+					let usage = commands[cmd].usage;
+					if (usage) {
+						command += " " + usage;
+					}
+					let description = commands[cmd].description;
+					if(description){
+						command += "\n\t" + description;
+					}
+					commandList+=command+"\n";
 				}
-				let description = commands[cmd].description;
-				if(description){
-					command += "\n\t" + description;
-				}
-				commandList+=command+"\n";
 			}
 			commandList += musicPanel;
 			message.author.sendMessage(commandList)
