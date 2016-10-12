@@ -42,7 +42,8 @@ ${prefix}time : Shows the playtime of the song.
 ${prefix}volume+(+++) : increases volume by 2%/+
 ${prefix}volume-(---) : decreases volume by 2%/-
 \`\`\`
-`;
+`, 
+	blacklistedRoles = ['@everyone','Initiate'];
 
 let queue = {};
 
@@ -293,7 +294,7 @@ bot.on('message', (msg) => {
 		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then(msg.channel.sendMessage("Welcome, Initiate.")).catch(console.log);
 	};
 
-	if(!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === 'dm' || msg.channel.type != 'dm' && msg.member.highestRole.name === '@everyone') return;
+	if(!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === 'dm' || msg.channel.type != 'dm' && blacklistedRoles.indexOf(msg.member.highestRole.name) != -1) return;
 
 	//Trim the mention from the message and any whitespace
 	var command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
