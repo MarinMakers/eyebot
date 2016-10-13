@@ -18,14 +18,17 @@ const decider = require('./nifty/decisions.js')(bot);
 const gitHelper = require('./nifty/git.js')(bot);
 const todo = require('./nifty/todo.js')(bot);
 
-//call checkRole(message.sender, message.server, 'role')
-bot.checkRole = (user, server, role) => {
-	for (var i = 0; i < server.roles.length; i++){
-		if(server.roles[i].name == role && user.hasRole(server.roles[i])){
-			return true;
-		}
+//bot methods
+bot.checkRole = (msg, role) => {
+	let foundRole = msg.guild.roles.find('name',role);
+	 if (msg.member.roles.has(foundRole.id)){
+	 	return true;
+	 } else {
+		return false;
 	}
-	return false;
+}
+bot.reject = (msg)=> {
+	msg.channel.sendCode('diff','- Access Denied');
 }
 
 var getMethod = (argument) => {
@@ -79,12 +82,12 @@ const commands = {
 	},
 	'pull': {
 		process: (message, argument) => {
-			if (bot.checkRole(message.author, message.server, 'developer')){
+			if (bot.checkRole(message, 'dev')){
 				gitHelper.pull((msg) => {
 					message.channel.sendMessage(msg);
 				})
 			}else{
-				message.channel.sendMessage("You don't have enough badges to train me!");
+				bot.reject(message);
 			}
 		},
 		description: "Pulls the bot's code from github on to the server. You must have the role 'developer' to use this functionality.",
@@ -107,7 +110,7 @@ const commands = {
 					commandList+=command+"\n";
 				}
 			}
-			commandList += "```"+ data.musicPanel;
+			commandList += "```\n"+ data.musicPanel;
 			message.author.sendMessage(commandList)
 		},
 		description: "Messages user list of commands"
@@ -130,13 +133,14 @@ const commands = {
 	},
 	'kill': {
 		process: (message, argument) => {
-			if (bot.checkRole(message.author, message.server, 'Elder') || bot.checkRole(message.author, message.server, 'Head Scribe')) {
-				console.log("Being shut down by " + message.author.username);
+			if (bot.checkRole(message, 'Elder') || bot.checkRole(message, 'Head Scribe')) {
+				console.log("Yep")
 				message.channel.sendMessage("*Beep boop, click*").then(()=> {
+					console.log("Being shut down by " + message.author.username);
 					process.exit();
 				});
 			}  else {
-				message.channel.sendMessage("Insufficient Privileges.");
+				bot.reject(message);
 			}
 		},
 		description: "This kills the robot. Must have privileges to execute.",
@@ -298,7 +302,7 @@ bot.on('message', (msg) => {
 })
 
 bot.on('guildMemberAdd', (guild, member) => {
-    guild.channels.get(data.vaultDoorID).sendMessage("Wastelander spotted in the area! " + member);
+    guild.channels.get(data.vaultDoorID).sendMessage("**__Trespasser spotted in the area__** " + member);
     member.sendMessage(data.motd);
 })
 
