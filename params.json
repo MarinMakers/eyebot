@@ -1,0 +1,6 @@
+{
+  "name": "Eyebot",
+  "tagline": "A Discord chatbot for the Brotherhood of Steel server",
+  "body": "# Eyebot\r\nA chatbot for the [Brotherhood of Steel Discord Server](https://discord.gg/VB56Xtf)\r\n\r\n## Table of Contents:\r\n1. [Planned Features](#planned-features)\r\n1. [Contributing](#contributing)\r\n1. [Credits](#credits)\r\n\r\n\r\n### Planned Features\r\n - [ ] !propaganda - Posts misc Brotherhood of Steel propaganda\r\n - [ ] Music functionality\r\n - [ ] !file - pseudo-CLI to view contents and open resources like chat logs and reading material.\r\n \r\n### Contributing\r\nIf you would like to contribute to the bot, please open a pull request and leave a detailed commit message.\r\n\r\n### Credits\r\nThanks to all those that contribute! Ad Victoriam!\r\n\r\n![Eyebot][1]\r\n\r\n[1]: https://s-media-cache-ak0.pinimg.com/originals/c2/93/dd/c293dda1b7e18a762c08ab4c7e639b5f.gif\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
