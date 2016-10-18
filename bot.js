@@ -4,7 +4,7 @@ const discord_auth = require('./auth.json');
 
 const bot = new Discord.Client();
 
-const data = require('./data.json');
+const data = require('./db/data.json');
 const prefix = data.prefix;
 
 let queue = {};
