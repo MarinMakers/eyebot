@@ -171,7 +171,8 @@ const commands = {
 					message.channel.sendFile('assets/images/'+ files[Math.floor(Math.random()*files.length)]);
 				}
 			})
-		}
+		},
+		description: "Display a piece of BoS propaganda."
 	},
 	'info': {
 		process: (message,argument) => {
@@ -204,11 +205,11 @@ const commands = {
 						msg.channel.sendMessage('resumed').then(() => {dispatcher.resume();});
 					} else if (m.content.startsWith(prefix + 'skip')){
 						msg.channel.sendMessage('skipped').then(() => {dispatcher.end();});
-					} else if (m.content.startsWith('volume+')){
+					} else if (m.content.startsWith(prefix + 'volume+')){
 						if (Math.round(dispatcher.volume*50) >= 100) return msg.channel.sendMessage(`Volume: ${Math.round(dispatcher.volume*50)}%`);
 						dispatcher.setVolume(Math.min((dispatcher.volume*50 + (2*(m.content.split('+').length-1)))/50,2));
 						msg.channel.sendMessage(`Volume: ${Math.round(dispatcher.volume*50)}%`);
-					} else if (m.content.startsWith('volume-')){
+					} else if (m.content.startsWith(prefix + 'volume-')){
 						if (Math.round(dispatcher.volume*50) <= 0) return msg.channel.sendMessage(`Volume: ${Math.round(dispatcher.volume*50)}%`);
 						dispatcher.setVolume(Math.max((dispatcher.volume*50 - (2*(m.content.split('-').length-1)))/50,0));
 						msg.channel.sendMessage(`Volume: ${Math.round(dispatcher.volume*50)}%`);
@@ -230,7 +231,8 @@ const commands = {
 				});
 			})(queue[msg.guild.id].songs[0]);
 		},
-		description: "Make Musicbot play the song queue in current voice channel."
+		description: "Make Musicbot play the song queue in current voice channel.",
+		discrete: true
 	},
 	'join': {
 		process: (msg) => {
@@ -240,7 +242,8 @@ const commands = {
 				voiceChannel.join().then(connection => resolve(connection)).catch(err => reject(err));
 			});
 		},
-		description: "Musicbot joins your channel."
+		description: "Musicbot joins your channel.",
+		discrete: true
 	},
 	'add': {
 		process: (msg) => {
@@ -253,7 +256,8 @@ const commands = {
 				msg.channel.sendMessage(`added **${info.title}** to the queue`);
 			});
 		},
-		description: "Add youtube link to music queue."
+		description: "Add youtube link to music queue.",
+		discrete: true
 	},
 	'queue': {
 		process: (msg) => {
@@ -262,7 +266,8 @@ const commands = {
 			queue[msg.guild.id].songs.forEach((song, i) => { tosend.push(`${i+1}. ${song.title} - Requested by: ${song.requester}`);});
 			msg.channel.sendMessage(`__**${msg.guild.name}'s Music Queue:**__ Currently **${tosend.length}** songs queued ${(tosend.length > 15 ? '*[Only next 15 shown]*' : '')}\n\`\`\`${tosend.slice(0,15).join('\n')}\`\`\``);
 		},
-		description: "View music queue."
+		description: "View music queue.",
+		discrete: true
 	}
 }
 
@@ -302,7 +307,7 @@ bot.on('message', (msg) => {
 })
 
 bot.on('guildMemberAdd', (guild, member) => {
-    guild.channels.get(data.vaultDoorID).sendMessage("**__Trespasser spotted in the area__** " + member);
+    guild.channels.get(data.vaultDoorID).sendMessage("Trespasser spotted in the area: **" + member + "**");
     member.sendMessage(data.motd);
 })
 
