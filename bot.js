@@ -298,7 +298,7 @@ bot.on('message', (msg) => {
 	//Trim the mention from the message and any whitespace
 	var command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
 	if (command.startsWith(prefix)) {
-		var to_execute = command.split(prefix).pop().split(' ')[0];
+		var to_execute = command.split(prefix).slice(1).join().split(' ')[0];
 		var argument = command.substring(command.indexOf(' ')+1, command.length);
 		if (commands[to_execute]) {
 			commands[to_execute].process(msg, argument)
