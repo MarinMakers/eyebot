@@ -175,7 +175,7 @@ const commands = {
 	},
 	'info': {
 		process: (message,argument) => {
-			message.channel.sendMessage(credits);
+			message.channel.sendMessage(data.credits);
 		},
 		description: "Credits for the bot."
 	},
