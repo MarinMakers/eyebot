@@ -17,6 +17,7 @@ const yt = require('ytdl-core');
 const decider = require('./nifty/decisions.js')(bot); 
 const gitHelper = require('./nifty/git.js')(bot);
 const todo = require('./nifty/todo.js')(bot);
+var level;
 
 //bot methods
 bot.checkRole = (msg, role) => {
@@ -46,55 +47,55 @@ var getParameter = (argument) => {
 
 const commands = {
 	'todo': {
-		process: (message, argument) => {
+		process: (msg, argument) => {
 			// Get rid of this at some point
 			var messageFunction = (msg) => {
-				message.channel.sendMessage(msg);
+				msg.channel.sendMessage(msg);
 			}
 
 			var method = getMethod(argument);
 			
 			if (method === "add"){
 				var taskToAdd = getParameter(argument);
-				todo.add(taskToAdd, message, messageFunction);
+				todo.add(taskToAdd, msg, messageFunction);
 			}  else if (method === "remove"){
 				var ids = getParameter(argument);
-				todo.remove(ids, message, messageFunction);
+				todo.remove(ids, msg, messageFunction);
 			}  else if (method === "complete"){
 				var id = getParameter(argument);
-				todo.complete(id, message, messageFunction);
+				todo.complete(id, msg, messageFunction);
 				// complete tasks
 			}  else if (method === "export") {
-				todo.exportList(message, messageFunction);
+				todo.exportList(msg, messageFunction);
 			}  else{
-				todo.showTasks(message, messageFunction);
+				todo.showTasks(msg, messageFunction);
 			}
 		},
 		usage: "[add <string>] [remove <id>] [complete <id>]",
 		description: "Interact with the bot's todo lists."
 	},
 	'ping': {
-		process: (message, argument) => {
-			message.channel.sendMessage(message.author + " pong!");
-			console.log(message.author.username);
+		process: (msg, argument) => {
+			msg.channel.sendMessage(msg.author + " pong!");
+			console.log(msg.author.username);
 		},
 		description: "Check if the bot is online."
 	},
 	'pull': {
-		process: (message, argument) => {
-			if (bot.checkRole(message, 'dev')){
+		process: (msg, argument) => {
+			if (bot.checkRole(msg, 'dev')){
 				gitHelper.pull((msg) => {
-					message.channel.sendMessage(msg);
+					msg.channel.sendMessage(msg);
 				})
 			}else{
-				bot.reject(message);
+				bot.reject(msg);
 			}
 		},
 		description: "Pulls the bot's code from github on to the server. You must have the role 'developer' to use this functionality.",
 		discrete:true
 	},
 	'help': {
-		process: (message, argument) => {
+		process: (msg, argument) => {
 			let commandList = 'Available Commands:```'
 			for (cmd in commands) {
 				if (!commands[cmd].discrete) {
@@ -111,74 +112,88 @@ const commands = {
 				}
 			}
 			commandList += "```\n"+ data.musicPanel;
-			message.author.sendMessage(commandList)
+			msg.author.sendMessage(commandList)
 		},
 		description: "Messages user list of commands"
 	},
 	'roll': {
-		process: (message, argument) => {
+		process: (msg, argument) => {
 			decider.rollDice(argument, (result) => {
-				message.channel.sendMessage(result)
+				msg.channel.sendMessage(result)
 			})
 		},
 		usage: "<d20 syntax>",
 		description: "Roll dice using d20 syntax"
 	},
 	'say': {
-		process: (message, argument) => {
-			message.channel.sendMessage(argument);
+		process: (msg, argument) => {
+			msg.channel.sendMessage(argument);
 		},
 		usage: "<string>",
 		description: "Make the bot say something"
 	},
 	'kill': {
-		process: (message, argument) => {
-			if (bot.checkRole(message, 'Elder') || bot.checkRole(message, 'Head Scribe')) {
+		process: (msg, argument) => {
+			if (bot.checkRole(msg, 'Elder') || bot.checkRole(msg, 'Head Scribe')) {
 				console.log("Yep")
-				message.channel.sendMessage("*Beep boop, click*").then(()=> {
-					console.log("Being shut down by " + message.author.username);
+				msg.channel.sendMessage("*Beep boop, click*").then(()=> {
+					console.log("Being shut down by " + msg.author.username);
 					process.exit();
 				});
 			}  else {
-				bot.reject(message);
+				bot.reject(msg);
 			}
 		},
 		description: "This kills the robot. Must have privileges to execute.",
 		discrete: true
 	},
 	'task': {
-		process: (message, argument) => {
-			commands["!todo"].process(message,argument)
+		process: (msg, argument) => {
+			commands["!todo"].process(msg,argument)
 		},
 		description: "Alias for !todo"
 	},
 	'enlist': {
-		process: (message,argument) => {
+		process: (msg,argument) => {
 
 		},
 		description: "Join the Brotherhood of Steel."
 	},
 	'propaganda': {
-		process: (message,argument) => {
+		process: (msg,argument) => {
 			fs.readdir('./assets/images', (err, files) => {
 				if (err) {
-					message.channel.sendMessage("No assets found.")
+					msg.channel.sendMessage("No assets found.")
 				}  else {
 					files = files.filter((file)=> {
 						return file.substring(0,1) != '.';
 					});
 					console.log(files);
-					message.channel.sendFile('assets/images/'+ files[Math.floor(Math.random()*files.length)]);
+					msg.channel.sendFile('assets/images/'+ files[Math.floor(Math.random()*files.length)]);
 				}
 			})
 		},
 		description: "Display a piece of BoS propaganda."
 	},
 	'info': {
-		process: (message,argument) => {
-			message.channel.sendMessage(data.credits);
+		process: (msg,argument) => {
+			msg.channel.sendMessage(data.credits);
 		},
 		description: "Credits for the bot."
+	},
+	'level': {
+		process: (msg,argument)=>{
+			if (msg.content.split(" ").length = 1) {
+				level.get(msg);
+			}
+		}
+	},
+	'xp': {
+		process: (msg,argument)=> {
+			if (bot.checkRole(msg,"Elder")||bot.checkRole(msg,"Head Scribe")||bot.checkRole(msg,"Head Paladin")||bot.checkRole(msg,"Head Knight")) {
+				level.give(msg,argument);
+			}  else bot.reject(msg);
+		}
 	},
 	'play': {
 		process: (msg) => {
@@ -296,11 +311,11 @@ bot.on('ready', ()=> {
 			connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
 		})
 	}
+	level = require('./nifty/level.js')(bot);
 })
 
 bot.on('message', (msg) => {
 	// if not something the bot cares about, exit out
-
 	if (msg.channel.type != 'dm' && msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
 		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
 			msg.member.setNickname(`Initiate ${msg.author.username}`).then((value) => {
