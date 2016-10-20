@@ -191,15 +191,15 @@ const commands = {
 			console.log(queue);
 			(function play(song) {
 				console.log(song);
-				if (song === undefined) return msg.channel.sendMessage('Queue is empty').then(() => {
-					queue[msg.guild.id].playing = false;
-					msg.member.voiceChannel.leave();
-				});
-				if (!queue[msg.guild.id].looping){
+				if (song === undefined) {
+					song = ({url:data.defaultSong});
+				};
+				if (!queue[msg.guild.id].looping && song.title){
 					msg.channel.sendMessage(`Playing: **${song.title}** as requested by: **${song.requester}**`);
 				}
 				dispatcher = msg.guild.voiceConnection.playStream(yt(song.url, { audioonly: true }), { passes : 1 });
 				let collector = msg.channel.createCollector(m => m);
+				console.log(collector);
 				collector.on('message', m => {
 					if (m.content.startsWith(prefix + 'pause')) {
 						msg.channel.sendMessage('paused').then(() => {dispatcher.pause();});
@@ -221,7 +221,7 @@ const commands = {
 					} else if (m.content.startsWith(prefix + 'time')){
 						msg.channel.sendMessage(`time: ${Math.floor(dispatcher.time / 60000)}:${Math.floor((dispatcher.time % 60000)/1000) <10 ? '0'+Math.floor((dispatcher.time % 60000)/1000) : Math.floor((dispatcher.time % 60000)/1000)}`);
 					} else if (m.content.startsWith(prefix + 'loop')){
-						msg.channel.sendMessage('Looping **${song.title}%**. To exit loop, use !skip').then(()=>{queue[msg.guild.id].looping=true})
+						msg.channel.sendMessage(`Looping **${song.title}**. To exit loop, use !skip`).then(()=>{queue[msg.guild.id].looping=true})
 					}
 				});
 				dispatcher.on('end', () => {
@@ -284,7 +284,18 @@ const commands = {
 bot.login(discord_auth.token);
 
 bot.on('ready', ()=> {
-	console.log("Eyebot Online")
+	console.log("Eyebot Online");
+	let guildArr = bot.guilds.array();
+
+	// Join the last channel of every guild that the bot is in.
+	for (guild in guildArr) {
+		tempCollection = guildArr[guild].channels.filter((channel)=> {
+			return channel.type === "voice"
+		})	
+		tempCollection.find("position",tempCollection.array().length-1).join().then(connection => {
+			connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
+		})
+	}
 })
 
 bot.on('message', (msg) => {
@@ -292,7 +303,7 @@ bot.on('message', (msg) => {
 
 	if (msg.channel.type != 'dm' && msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
 		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
-			msg.member.setNickname("Initiate "+ msg.author.username).then((value) => {
+			msg.member.setNickname(`Initiate ${msg.author.username}`).then((value) => {
 				msg.channel.sendMessage("Welcome, Initiate.");
 			}, (reason) => {
 				console.log(reason);
@@ -316,7 +327,7 @@ bot.on('message', (msg) => {
 })
 
 bot.on('guildMemberAdd', (guild, member) => {
-    guild.channels.get(data.vaultDoorID).sendMessage("Trespasser spotted in the area: **" + member + "**");
+    guild.channels.get(data.vaultDoorID).sendMessage(`Trespasser spotted in the area: **${member.user.username}**`);
     member.sendMessage(data.motd);
 })
 
