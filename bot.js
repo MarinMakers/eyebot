@@ -195,7 +195,9 @@ const commands = {
 					queue[msg.guild.id].playing = false;
 					msg.member.voiceChannel.leave();
 				});
-				msg.channel.sendMessage(`Playing: **${song.title}** as requested by: **${song.requester}**`);
+				if (!queue[msg.guild.id].looping){
+					msg.channel.sendMessage(`Playing: **${song.title}** as requested by: **${song.requester}**`);
+				}
 				dispatcher = msg.guild.voiceConnection.playStream(yt(song.url, { audioonly: true }), { passes : 1 });
 				let collector = msg.channel.createCollector(m => m);
 				collector.on('message', m => {
@@ -204,7 +206,10 @@ const commands = {
 					} else if (m.content.startsWith(prefix + 'resume')){
 						msg.channel.sendMessage('resumed').then(() => {dispatcher.resume();});
 					} else if (m.content.startsWith(prefix + 'skip')){
-						msg.channel.sendMessage('skipped').then(() => {dispatcher.end();});
+						msg.channel.sendMessage('skipped').then(() => {
+							queue[msg.guild.id].looping=false;
+							dispatcher.end();
+						});
 					} else if (m.content.startsWith(prefix + 'volume+')){
 						if (Math.round(dispatcher.volume*50) >= 100) return msg.channel.sendMessage(`Volume: ${Math.round(dispatcher.volume*50)}%`);
 						dispatcher.setVolume(Math.min((dispatcher.volume*50 + (2*(m.content.split('+').length-1)))/50,2));
@@ -215,11 +220,15 @@ const commands = {
 						msg.channel.sendMessage(`Volume: ${Math.round(dispatcher.volume*50)}%`);
 					} else if (m.content.startsWith(prefix + 'time')){
 						msg.channel.sendMessage(`time: ${Math.floor(dispatcher.time / 60000)}:${Math.floor((dispatcher.time % 60000)/1000) <10 ? '0'+Math.floor((dispatcher.time % 60000)/1000) : Math.floor((dispatcher.time % 60000)/1000)}`);
+					} else if (m.content.startsWith(prefix + 'loop')){
+						msg.channel.sendMessage('Looping **${song.title}%**. To exit loop, use !skip').then(()=>{queue[msg.guild.id].looping=true})
 					}
 				});
 				dispatcher.on('end', () => {
 					collector.stop();
-					queue[msg.guild.id].songs.shift();
+					if (!queue[msg.guild.id].looping){
+						queue[msg.guild.id].songs.shift();
+					}
 					play(queue[msg.guild.id].songs[0]);
 				});
 				dispatcher.on('error', (err) => {
@@ -298,8 +307,8 @@ bot.on('message', (msg) => {
 	//Trim the mention from the message and any whitespace
 	var command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
 	if (command.startsWith(prefix)) {
-		var to_execute = command.split(prefix).slice(1).join().split(' ')[0];
-		var argument = command.substring(command.indexOf(' ')+1, command.length);
+		let to_execute = command.split(prefix).slice(1).join().split(' ')[0];
+		let argument = command.split(prefix).slice(1).join().split(' ').slice(1).join(" ");
 		if (commands[to_execute]) {
 			commands[to_execute].process(msg, argument)
 		}
