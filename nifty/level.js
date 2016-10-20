@@ -4,7 +4,7 @@ const path = require('path');
 try {
 	const xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,'../db/xp.json')));
 } catch(e) {
-	// process.stdout.write('User XP file not found. Making a blank one now.')
+	process.stdout.write('User XP file not found. Making a blank one now.\n')
 	fs.writeFileSync(path.join(__dirname,"../db/xp.json"),`{"users":[]}`);
 	let xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,"../db/xp.json")));
 	// let ticker = setInterval(function(){process.stdout.write(".")},1000);
