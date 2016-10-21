@@ -29,8 +29,8 @@ bot.checkRole = (msg, role) => {
 	}
 }
 bot.reject = (msg)=> {
-	msg.channel.sendCode('diff','- Access Denied');
-	console.log(`${bot.timestamp()} ${msg.member.name} tried to use the command ${msg.cleanContent}`)
+	msg.channel.sendCode('diff','- Access Denied\nThis incident will be reported');
+	console.log(`${bot.timestamp()} ${msg.member.nickname} tried to use the command ${msg.cleanContent}`)
 }
 
 bot.timestamp = (msg) => {

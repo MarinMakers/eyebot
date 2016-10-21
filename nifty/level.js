@@ -94,22 +94,24 @@ var msgXp = function (msg,minutes,amount) {
 // !level add @Mcnamara 400
 var giveXp = function (msg, argument) {
 	let target = msg.mentions.users.first();
-	let xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,'../db/xp.json')))
-	for (i in xpFile.users) {
-		if (xpFile.users[i].id === target.id) {
-			let tempArr = msg.content.trim().split(" ");
-			let xpAmount = parseInt(tempArr[tempArr.length-1]);
-			let newXp= xpFile.users[i].xp+xpAmount;
-			if (quadratic(xpFile.users[i].xp) < quadratic(newXp)) {
-				msg.channel.sendMessage(`${target} increased to **Level ${quadratic(newXp)}!**`);
+	if (target) {
+		let xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,'../db/xp.json')))
+		for (i in xpFile.users) {
+			if (xpFile.users[i].id === target.id) {
+				let tempArr = msg.content.trim().split(" ");
+				let xpAmount = parseInt(tempArr[tempArr.length-1]);
+				let newXp= xpFile.users[i].xp+xpAmount;
+				if (quadratic(xpFile.users[i].xp) < quadratic(newXp)) {
+					msg.channel.sendMessage(`${target} increased to **Level ${quadratic(newXp)}!**`);
+				}
+				xpFile.users[i].xp = newXp;
+				console.log(`${bot.timestamp()} ${msg.member.nickname} gave ${target.username} ${xpAmount}xp`);
+				remember(xpFile);
+				return;
 			}
-			xpFile.users[i].xp = newXp;
-			console.log(`${bot.timestamp()} ${msg.member.nickname} gave ${target.username} ${xpAmount}xp`);
-			remember(xpFile);
-			return;
 		}
+		return addUser(msg,xpFile);
 	}
-	return addUser(msg,xpFile);
 }
 
 function remember(file) {
