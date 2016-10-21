@@ -16,7 +16,8 @@ try {
 			let pushData = {
 				"id":members[j].user.id,
 				"username": members[j].user.username,
-				"xp":0
+				"xp":0,
+				"lastMsg": new Date()
 			}
 			xpFile.users.push(pushData);
 		}
@@ -33,7 +34,7 @@ function addUser (msg,xpFile) {
 		}
 		xpFile.users.push(pushData);
 		remember(xpFile);
-		console.log(`[${new Date()}] - Added user ${pushData.username}`);
+		console.log(`${bot.timestamp} Added ${pushData.username} to xpfile`);
 	})
 }
 
@@ -50,7 +51,7 @@ function quadratic(y){
 	return Math.floor((-(b)+(Math.pow((Math.pow(b,2)- 4*a*c),0.5))) / (2*a));
 }
 
-//returns amount of XP over lvl
+//returns amount of XP remainder over lvl
 function diff(xp) {
 	return xp - xpCost(quadratic(xp));
 }
@@ -60,16 +61,36 @@ var info = function (msg) {
 	let xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,'../db/xp.json')))
 	for (i in xpFile.users) {
 		if (xpFile.users[i].id === msg.author.id) {
-			console.log(xpFile.users[i]);
 			let xp = xpFile.users[i].xp;
 			let level = quadratic(xp);
 			msg.channel.sendMessage(`${msg.member}: **Level ${level}** - **${diff(xp)}/${xpCost(level+1) - xpCost(level)} XP**`);
 			return;
 		}
 	}
-	addUser(msg,xpFile);
-	return console.log("Not found.")
+	return addUser(msg,xpFile);
 }
+
+//Give small amount of XP every amount of time
+var msgXp = function (msg,minutes,amount) {
+	let xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,'../db/xp.json')))
+	for (i in xpFile.users) {
+		if (xpFile.users[i].id === msg.author.id) {
+			if ((new Date() - new Date(xpFile.users[i].lastMsg)) > (60000*minutes)) {
+				let newXp = xpFile.users[i].xp+amount;
+				if (quadratic(xpFile.users[i].xp) < quadratic(newXp)) {
+					msg.channel.sendMessage(`${msg.author} increased to **Level ${quadratic(newXp)}!**`);
+					console.log(`${bot.timestamp} ${msg.member.nickname} grew to level ${quadratic(newXp)}`);
+				}
+				xpFile.users[i].xp = newXp;
+				xpFile.users[i].lastMsg = new Date();
+				remember(xpFile);
+			}
+			return;
+		}
+	}
+	return addUser(msg,xpFile);
+}
+
 // !level add @Mcnamara 400
 var giveXp = function (msg, argument) {
 	let target = msg.mentions.users.first();
@@ -83,13 +104,12 @@ var giveXp = function (msg, argument) {
 				msg.channel.sendMessage(`${msg.author} increased to **Level ${quadratic(newXp)}!**`);
 			}
 			xpFile.users[i].xp = newXp;
-			console.log(`[${new Date()}] - ${msg.member.nickname} gave ${target.username} ${xpAmount}xp`);
+			console.log(`${bot.timestamp} ${msg.member.nickname} gave ${target.username} ${xpAmount}xp`);
 			remember(xpFile);
 			return;
 		}
 	}
-	addUser(msg,xpFile);
-	return console.log("Not found.")
+	return addUser(msg,xpFile);
 }
 
 function remember(file) {
@@ -100,6 +120,7 @@ function remember(file) {
 module.exports = function(bot)  {
 	return {
 		get:info,
-		give:giveXp
+		give:giveXp,
+		msgXp:msgXp
 	}
 }
