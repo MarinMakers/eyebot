@@ -63,7 +63,7 @@ var info = function (msg) {
 			console.log(xpFile.users[i]);
 			let xp = xpFile.users[i].xp;
 			let level = quadratic(xp);
-			msg.channel.sendMessage(`${msg.member.nickname}: **Level ${level} - ${diff(xp)}/${xpCost(level+1) - xpCost(level)} XP**`);
+			msg.channel.sendMessage(`${msg.member}: **Level ${level}** - **${diff(xp)}/${xpCost(level+1) - xpCost(level)} XP**`);
 			return;
 		}
 	}
@@ -78,7 +78,11 @@ var giveXp = function (msg, argument) {
 		if (xpFile.users[i].id === target.id) {
 			let tempArr = msg.content.trim().split(" ");
 			let xpAmount = parseInt(tempArr[tempArr.length-1]);
-			xpFile.users[i].xp+=xpAmount;
+			let newXp= xpFile.users[i].xp+xpAmount;
+			if (quadratic(xpFile.users[i].xp) < quadratic(newXp)) {
+				msg.channel.sendMessage(`${msg.author} increased to **Level ${quadratic(newXp)}!**`);
+			}
+			xpFile.users[i].xp = newXp;
 			console.log(`[${new Date()}] - ${msg.member.nickname} gave ${target.username} ${xpAmount}xp`);
 			remember(xpFile);
 			return;
