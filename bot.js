@@ -324,6 +324,7 @@ bot.on('ready', ()=> {
 })
 
 bot.on('message', (msg) => {
+	if (msg.author.bot) return;
 	//once every x minutes, give poster y xp
 	level.msgXp(msg,3,10);
 	// if not something the bot cares about, exit out
@@ -339,7 +340,7 @@ bot.on('message', (msg) => {
 		});
 	};
 
-	if(!msg.content.startsWith(prefix) || msg.author.bot || msg.channel.type === 'dm' || msg.channel.type != 'dm' && data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1) return;
+	if(!msg.content.startsWith(prefix) || msg.channel.type === 'dm' || msg.channel.type != 'dm' && data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1) return;
 
 	//Trim the mention from the message and any whitespace
 	var command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();

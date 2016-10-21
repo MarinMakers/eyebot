@@ -79,7 +79,7 @@ var msgXp = function (msg,minutes,amount) {
 				let newXp = xpFile.users[i].xp+amount;
 				if (quadratic(xpFile.users[i].xp) < quadratic(newXp)) {
 					msg.channel.sendMessage(`${msg.author} increased to **Level ${quadratic(newXp)}!**`);
-					console.log(`${bot.timestamp} ${msg.member.nickname} grew to level ${quadratic(newXp)}`);
+					console.log(`${bot.timestamp()} ${msg.member.nickname} grew to level ${quadratic(newXp)}`);
 				}
 				xpFile.users[i].xp = newXp;
 				xpFile.users[i].lastMsg = new Date();
@@ -101,10 +101,10 @@ var giveXp = function (msg, argument) {
 			let xpAmount = parseInt(tempArr[tempArr.length-1]);
 			let newXp= xpFile.users[i].xp+xpAmount;
 			if (quadratic(xpFile.users[i].xp) < quadratic(newXp)) {
-				msg.channel.sendMessage(`${msg.author} increased to **Level ${quadratic(newXp)}!**`);
+				msg.channel.sendMessage(`${target} increased to **Level ${quadratic(newXp)}!**`);
 			}
 			xpFile.users[i].xp = newXp;
-			console.log(`${bot.timestamp} ${msg.member.nickname} gave ${target.username} ${xpAmount}xp`);
+			console.log(`${bot.timestamp()} ${msg.member.nickname} gave ${target.username} ${xpAmount}xp`);
 			remember(xpFile);
 			return;
 		}
