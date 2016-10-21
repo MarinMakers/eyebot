@@ -30,6 +30,11 @@ bot.checkRole = (msg, role) => {
 }
 bot.reject = (msg)=> {
 	msg.channel.sendCode('diff','- Access Denied');
+	console.log(`${bot.timestamp()} ${msg.member.name} tried to use the command ${msg.cleanContent}`)
+}
+
+bot.timestamp = (msg) => {
+	return `[ ${new Date()} ] -`;
 }
 
 var getMethod = (argument) => {
@@ -77,7 +82,7 @@ const commands = {
 	'ping': {
 		process: (msg, argument) => {
 			msg.channel.sendMessage(msg.author + " pong!");
-			console.log(msg.author.username);
+			console.log(`${bot.timestamp()} msg.author.username`);
 		},
 		description: "Check if the bot is online."
 	},
@@ -299,7 +304,8 @@ const commands = {
 bot.login(discord_auth.token);
 
 bot.on('ready', ()=> {
-	console.log("Eyebot Online");
+	bot.user.setStatus("online",`Say ${prefix}help`)
+	.then(user=> console.log("Eyebot Online"));
 	let guildArr = bot.guilds.array();
 
 	// Join the last channel of every guild that the bot is in.
@@ -344,6 +350,7 @@ bot.on('message', (msg) => {
 bot.on('guildMemberAdd', (guild, member) => {
     guild.channels.get(data.vaultDoorID).sendMessage(`Trespasser spotted in the area: **${member.user.username}**`);
     member.sendMessage(data.motd);
+    console.log(`${bot.timestamp} user ${member.username} joined channel.`)
 })
 
 // //HTTP server stuff
