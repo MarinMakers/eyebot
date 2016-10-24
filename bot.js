@@ -62,18 +62,18 @@ const commands = {
 			
 			if (method === "add"){
 				var taskToAdd = getParameter(argument);
-				todo.add(taskToAdd, msg, messageFunction);
+				todo.add(taskToAdd, msg);
 			}  else if (method === "remove"){
 				var ids = getParameter(argument);
-				todo.remove(ids, msg, messageFunction);
+				todo.remove(ids, msg);
 			}  else if (method === "complete"){
 				var id = getParameter(argument);
-				todo.complete(id, msg, messageFunction);
+				todo.complete(id, msg);
 				// complete tasks
 			}  else if (method === "export") {
-				todo.exportList(msg, messageFunction);
+				todo.exportList(msg);
 			}  else{
-				todo.showTasks(msg, messageFunction);
+				todo.showTasks(msg);
 			}
 		},
 		usage: "[add <string>] [remove <id>] [complete <id>]",
@@ -82,7 +82,7 @@ const commands = {
 	'ping': {
 		process: (msg, argument) => {
 			msg.channel.sendMessage(msg.author + " pong!");
-			console.log(`${bot.timestamp()} msg.author.username`);
+			console.log(`${bot.timestamp()} ${msg.author.username} pinged the bot`);
 		},
 		description: "Check if the bot is online."
 	},

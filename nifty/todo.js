@@ -11,7 +11,7 @@ try {
 	listFile = JSON.parse(fs.readFileSync('./db/todo.json'));
 }
 
-var add = function(taskToAdd, message, messageFunction){
+var add = function(taskToAdd, message){
 
 	var idOnChannel = (listFile.channels[message.channel.name]) ? listFile.channels[message.channel.name] : 1;
 
@@ -30,14 +30,14 @@ var add = function(taskToAdd, message, messageFunction){
 
 	listFile.tasks.push(newTask);
 
-	messageFunction(message.author+": Entry " + listFile.channels[message.channel.name] + " added successfully!");
+	message.channel.sendMessage(message.author+": Entry " + listFile.channels[message.channel.name] + " added successfully!");
 
 	listFile.id = (listFile.id + 1);
 	listFile.channels[message.channel.name] += 1;
 	remember();
 }
 
-var remove = function(ids, message, messageFunction){
+var remove = function(ids, message){
 	var idArr = ids.split(",").map(function(num) {return parseInt(num.trim())});
 	for (id in idArr){
 		var found = false;
@@ -47,27 +47,27 @@ var remove = function(ids, message, messageFunction){
 				found = true;
 				if (singleTask.user == message.author.name || singleTask.complete){
 					listFile.tasks.splice(task, 1);
-					messageFunction(message.author+": Entry " + idArr[id] + " removed.");
+					message.channel.sendMessage(message.author+": Entry " + idArr[id] + " removed.");
 					break;
 				} else{
-					messageFunction("You do not have privileges for entry " + idArr[id]);
+					message.channel.sendMessage("You do not have privileges for entry " + idArr[id]);
 					break;
 				}
 			}
 		}
 		if (!found){
-			messageFunction("Sorry, couldn't find a task with the ID " + id);
+			message.channel.sendMessage("Sorry, couldn't find a task with the ID " + id);
 		}
 	}
 	remember();
 }
 
-var complete = function(completeId, message, messageFunction){
+var complete = function(completeId, message){
 	var completeId = parseInt(completeId);
 	for (task in listFile.tasks){
 		if (listFile.tasks[task].channel === message.channel.name && listFile.tasks[task].idOnChannel === completeId){
 			listFile.tasks[task].complete = true;
-			messageFunction(message.author+": Entry " + completeId + " has been completed.");
+			message.channel.sendMessage(message.author+": Entry " + completeId + " has been completed.");
 			break;
 		}
 	}
@@ -78,7 +78,7 @@ var remember = function(){
 	fs.writeFileSync('./db/todo.json', JSON.stringify(listFile));
 }
 
-var showTasks = function(message, messageFunction){
+var showTasks = function(message){
 	var todoList = listFile.tasks.filter(function(task){
 		return task.channel == message.channel.name;
 	})
@@ -96,13 +96,13 @@ var showTasks = function(message, messageFunction){
 			taskForm += singleTask.idOnChannel + ".) " + singleTask['user'] + ": " + singleTask['task'] + "\n";
 		}
 		taskForm += "```";
-		messageFunction(taskForm);
+		message.channel.sendMessage(taskForm);
 	}else{
-		messageFunction("No tasks found on this channel -- Add some with `!todo add <task>`");
+		message.channel.sendMessage("No tasks found on this channel -- Add some with `!todo add <task>`");
 	}
 }
 
-var exportList = function(message, messageFunction) {
+var exportList = function(message) {
 	message.channel.sendFile("./db/todo.json","To-do List","Uploading File...",function(err,msg) {
 		if (err) {
 			message.channel.sendMessage(err);
