@@ -26,11 +26,12 @@ try {
 }
 
 function addUser (msg,xpFile) {
-	msg.channel.sendMessage("Not Found... Adding your character.").then(()=> {
+	msg.author.sendMessage("Creating new character...").then(()=> {
 		let pushData = {
 			"id":msg.author.id,
 			"username": msg.author.username,
-			"xp":0
+			"xp":0,
+			"lastMsg":new Date()
 		}
 		xpFile.users.push(pushData);
 		remember(xpFile);
@@ -75,6 +76,11 @@ var msgXp = function (msg,minutes,amount) {
 	let xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,'../db/xp.json')))
 	for (i in xpFile.users) {
 		if (xpFile.users[i].id === msg.author.id) {
+			if (xpFile.users[i].lastMsg === undefined) {
+				xpFile.users[i].lastMsg = new Date;
+				remember(xpFile);
+				return;
+			}
 			if ((new Date() - new Date(xpFile.users[i].lastMsg)) > (60000*minutes)) {
 				let newXp = xpFile.users[i].xp+amount;
 				if (quadratic(xpFile.users[i].xp) < quadratic(newXp)) {
