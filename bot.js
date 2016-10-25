@@ -206,23 +206,27 @@ const commands = {
 	'play': {
 		process: (msg) => {
 			if (queue[msg.guild.id] === undefined) return msg.channel.sendMessage(`Add some songs to the queue first with !add`);
-			if (!msg.guild.voiceConnection) return commands['join'].process(msg).then(() => commands['play'].process(msg));
+			if (!msg.guild.voiceConnection) {
+				return commands['join'].process(msg).then(() => {
+					commands['play'].process(msg);
+					return;
+				});
+			}
 			if (queue[msg.guild.id].playing) return msg.channel.sendMessage('Already Playing');
 			let dispatcher;
 			queue[msg.guild.id].playing = true;
 
-			console.log(queue);
 			(function play(song) {
 				console.log(song);
 				if (song === undefined) {
-					song = ({url:data.defaultSong});
+					play({url:data.defaultSong});
+					return;
 				};
-				if (!queue[msg.guild.id].looping && song.title){
-					msg.channel.sendMessage(`Playing: **${song.title}** as requested by: **${song.requester}**`);
-				}
+				// if (!queue[msg.guild.id].looping && song.title != undefined){
+				// 	msg.channel.sendMessage(`Playing: **${song.title}** as requested by: **${song.requester}**`);
+				// }
 				dispatcher = msg.guild.voiceConnection.playStream(yt(song.url, { audioonly: true }), { passes : 1 });
 				let collector = msg.channel.createCollector(m => m);
-				console.log(collector);
 				collector.on('message', m => {
 					if (m.content.startsWith(prefix + 'pause')) {
 						msg.channel.sendMessage('paused').then(() => {dispatcher.pause();});
@@ -248,8 +252,10 @@ const commands = {
 					}
 				});
 				dispatcher.on('end', () => {
+					console.log("Did you just skip the default song?", song.url!=data.defaultSong.url);
+					console.log(queue[msg.guild.id].songs);
 					collector.stop();
-					if (!queue[msg.guild.id].looping){
+					if (!queue[msg.guild.id].looping||song.url!=data.defaultSong.url){
 						queue[msg.guild.id].songs.shift();
 					}
 					play(queue[msg.guild.id].songs[0]);
@@ -284,6 +290,7 @@ const commands = {
 			yt.getInfo(url, (err, info) => {
 				if(err) return msg.channel.sendMessage('Invalid YouTube Link: ' + err);
 				if (!queue.hasOwnProperty(msg.guild.id)) queue[msg.guild.id] = {}, queue[msg.guild.id].playing = false, queue[msg.guild.id].songs = [];
+				queue[msg.guild.id].defaulting = false;
 				queue[msg.guild.id].songs.push({url: url, title: info.title, requester: msg.author.username});
 				msg.channel.sendMessage(`added **${info.title}** to the queue`);
 			});
@@ -345,7 +352,9 @@ bot.on('message', (msg) => {
 	//Trim the mention from the message and any whitespace
 	var command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
 	if (command.startsWith(prefix)) {
+		//Get command to execute
 		let to_execute = command.split(prefix).slice(1).join().split(' ')[0];
+		//Get string after command
 		let argument = command.split(prefix).slice(1).join().split(' ').slice(1).join(" ");
 		if (commands[to_execute]) {
 			commands[to_execute].process(msg, argument)
@@ -356,7 +365,7 @@ bot.on('message', (msg) => {
 bot.on('guildMemberAdd', (guild, member) => {
     guild.channels.get(data.vaultDoorID).sendMessage(`Trespasser spotted in the area: **${member.user.username}**`);
     member.sendMessage(data.motd);
-    console.log(`${bot.timestamp} user ${member.username} joined channel.`)
+    console.log(`${bot.timestamp()} user ${member.username} joined channel.`)
 })
 
 // //HTTP server stuff

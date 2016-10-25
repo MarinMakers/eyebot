@@ -34,7 +34,7 @@ function addUser (msg,xpFile) {
 		}
 		xpFile.users.push(pushData);
 		remember(xpFile);
-		console.log(`${bot.timestamp} Added ${pushData.username} to xpfile`);
+		console.log(`${bot.timestamp()} Added ${pushData.username} to xpfile`);
 	})
 }
 
