@@ -226,6 +226,7 @@ const commands = {
 				// 	msg.channel.sendMessage(`Playing: **${song.title}** as requested by: **${song.requester}**`);
 				// }
 				dispatcher = msg.guild.voiceConnection.playStream(yt(song.url, { audioonly: true }), { passes : 1 });
+				queue[msg.guild.id].songs.shift();
 				let collector = msg.channel.createCollector(m => m);
 				collector.on('message', m => {
 					if (m.content.startsWith(prefix + 'pause')) {
@@ -252,13 +253,12 @@ const commands = {
 					}
 				});
 				dispatcher.on('end', () => {
-					console.log("Did you just skip the default song?", song.url!=data.defaultSong.url);
-					console.log(queue[msg.guild.id].songs);
 					collector.stop();
-					if (!queue[msg.guild.id].looping||song.url!=data.defaultSong.url){
-						queue[msg.guild.id].songs.shift();
+					if (queue[msg.guild.id].looping){
+						play(song);
+					}else{
+						play(queue[msg.guild.id].songs[0]);
 					}
-					play(queue[msg.guild.id].songs[0]);
 				});
 				dispatcher.on('error', (err) => {
 					return msg.channel.sendMessage('error: ' + err).then(() => {
@@ -321,8 +321,8 @@ bot.on('ready', ()=> {
 	// Join the last channel of every guild that the bot is in.
 	for (guild in guildArr) {
 		tempCollection = guildArr[guild].channels.filter((channel)=> {
-			return channel.type === "voice"
-		})	
+			return channel.type === "voice";
+		});
 		tempCollection.find("position",tempCollection.array().length-1).join().then(connection => {
 			connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
 		})
