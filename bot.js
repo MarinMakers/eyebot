@@ -140,7 +140,6 @@ const commands = {
 	'kill': {
 		process: (msg, argument) => {
 			if (bot.checkRole(msg, 'Elder') || bot.checkRole(msg, 'Head Scribe')) {
-				console.log("Yep")
 				msg.channel.sendMessage("*Beep boop, click*").then(()=> {
 					console.log("Being shut down by " + msg.author.username);
 					process.exit();
