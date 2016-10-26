@@ -332,7 +332,7 @@ bot.on('ready', ()=> {
 bot.on('message', (msg) => {
 	if (msg.author.bot) return;
 	//once every x minutes, give poster y xp
-	level.msgXp(msg,3,10);
+	level.msgXp(msg,3,5);
 	// if not something the bot cares about, exit out
 	if (msg.channel.type != 'dm' && msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
 		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
