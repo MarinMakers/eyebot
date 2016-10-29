@@ -335,15 +335,16 @@ bot.on('message', (msg) => {
 	level.msgXp(msg,3,5);
 	// if not something the bot cares about, exit out
 	if (msg.channel.type != 'dm' && msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
-		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
-			msg.member.setNickname(`Initiate ${msg.author.username}`).then((value) => {
-				msg.channel.sendMessage("Welcome, Initiate.");
-			}, (reason) => {
-				console.log(reason);
-			});
-		}, (reason) => {
-			console.log(reason);
-		});
+		// msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
+		// 	msg.member.setNickname(`Initiate ${msg.author.username}`).then((value) => {
+		// 		msg.channel.sendMessage("Welcome, Initiate.");
+		// 	}, (reason) => {
+		// 		console.log(reason);
+		// 	});
+		// }, (reason) => {
+		// 	console.log(reason);
+		// });
+		msg.channel.sendMessage("Automatic enlistment has been suspended. Please contact a member to join.");
 	};
 
 	if(!msg.content.startsWith(prefix) || msg.channel.type === 'dm' || msg.channel.type != 'dm' && data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1) return;
