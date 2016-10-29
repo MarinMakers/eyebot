@@ -153,7 +153,7 @@ const commands = {
 	},
 	'task': {
 		process: (msg, argument) => {
-			commands["!todo"].process(msg,argument)
+			commands["todo"].process(msg,argument)
 		},
 		description: "Alias for !todo"
 	},
