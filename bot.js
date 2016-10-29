@@ -221,9 +221,9 @@ const commands = {
 					play({url:data.defaultSong});
 					return;
 				};
-				// if (!queue[msg.guild.id].looping && song.title != undefined){
-				// 	msg.channel.sendMessage(`Playing: **${song.title}** as requested by: **${song.requester}**`);
-				// }
+				if (!queue[msg.guild.id].looping && song.title != undefined){
+					msg.channel.sendMessage(`Playing: **${song.title}** as requested by: **${song.requester}**`);
+				}
 				dispatcher = msg.guild.voiceConnection.playStream(yt(song.url, { audioonly: true }), { passes : 1 });
 				queue[msg.guild.id].songs.shift();
 				let collector = msg.channel.createCollector(m => m);
