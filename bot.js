@@ -316,12 +316,14 @@ bot.on('ready', ()=> {
 	bot.user.setStatus("online",`Say ${prefix}help`)
 	.then(user=> console.log("Eyebot Online"));
 	let guildArr = bot.guilds.array();
-
+	console.log(guildArr.length);
 	// Join the last channel of every guild that the bot is in.
 	for (guild in guildArr) {
 		tempCollection = guildArr[guild].channels.filter((channel)=> {
 			return channel.type === "voice";
 		});
+		console.log(`${guildArr[guild].name}, ${tempCollection.array().length}`);
+		console.log(tempCollection.array());
 		tempCollection.find("position",tempCollection.array().length-1).join().then(connection => {
 			connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
 		})
@@ -331,8 +333,6 @@ bot.on('ready', ()=> {
 
 bot.on('message', (msg) => {
 	if (msg.author.bot) return;
-	//once every x minutes, give poster y xp
-	level.msgXp(msg,3,5);
 	// if not something the bot cares about, exit out
 	if (msg.channel.type != 'dm' && msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
 		// msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
@@ -359,6 +359,9 @@ bot.on('message', (msg) => {
 		if (commands[to_execute]) {
 			commands[to_execute].process(msg, argument)
 		}
+	}  else {
+		//once every x minutes, give poster y xp
+		level.msgXp(msg,3,5);
 	}
 })
 
