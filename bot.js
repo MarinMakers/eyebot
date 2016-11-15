@@ -167,13 +167,14 @@ const commands = {
 		process: (msg,argument) => {
 			fs.readdir('./assets/images', (err, files) => {
 				if (err) {
-					msg.channel.sendMessage("No assets found.")
+					msg.channel.sendMessage("No assets found.");
 				}  else {
 					files = files.filter((file)=> {
 						return file.substring(0,1) != '.';
 					});
-					console.log(files);
 					msg.channel.sendFile('assets/images/'+ files[Math.floor(Math.random()*files.length)]);
+					console.log("Propaganda posted.");
+					return;
 				}
 			})
 		},
@@ -316,14 +317,12 @@ bot.on('ready', ()=> {
 	bot.user.setStatus("online",`Say ${prefix}help`)
 	.then(user=> console.log("Eyebot Online"));
 	let guildArr = bot.guilds.array();
-	console.log(guildArr.length);
 	// Join the last channel of every guild that the bot is in.
 	for (guild in guildArr) {
 		tempCollection = guildArr[guild].channels.filter((channel)=> {
 			return channel.type === "voice";
 		});
 		console.log(`${guildArr[guild].name}, ${tempCollection.array().length}`);
-		console.log(tempCollection.array());
 		tempCollection.find("position",tempCollection.array().length-1).join().then(connection => {
 			connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
 		})
@@ -344,7 +343,7 @@ bot.on('message', (msg) => {
 		// }, (reason) => {
 		// 	console.log(reason);
 		// });
-		msg.channel.sendMessage("Automatic enlistment has been suspended. Please contact a member to join.");
+		msg.channel.sendMessage("Due to security reasons, automatic enlistment has been suspended. Please contact a member to join.");
 	};
 
 	if(!msg.content.startsWith(prefix) || msg.channel.type === 'dm' || msg.channel.type != 'dm' && data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1) return;
