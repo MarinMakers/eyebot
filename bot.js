@@ -203,6 +203,42 @@ const commands = {
 		description: "Give XP to a user. Need permissions.",
 		usage: "@<username> <#>"
 	},
+	'update': {
+		process: (msg,argument)=> {
+            msg.channel.sendMessage("fetching updates...").then(function(sentMsg){
+                console.log("updating...");
+	            var spawn = require('child_process').spawn;
+                var log = function(err,stdout,stderr){
+                    if(stdout){console.log(stdout);}
+                    if(stderr){console.log(stderr);}
+                };
+                var fetch = spawn('git', ['fetch']);
+                fetch.stdout.on('data',function(data){
+                    console.log(data.toString());
+                });
+                fetch.on("close",function(code){
+                    var reset = spawn('git', ['reset','--hard','origin/master']);
+                    reset.stdout.on('data',function(data){
+                        console.log(data.toString());
+                    });
+                    reset.on("close",function(code){
+                        var npm = spawn('npm', ['install']);
+                        npm.stdout.on('data',function(data){
+                            console.log(data.toString());
+                        });
+                        npm.on("close",function(code){
+                            console.log("goodbye");
+                            sentMsg.edit("brb!").then(function(){
+                                bot.destroy().then(function(){
+                                    process.exit();
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        }
+	},
 	'play': {
 		process: (msg) => {
 			if (queue[msg.guild.id] === undefined) return msg.channel.sendMessage(`Add some songs to the queue first with !add`);
@@ -343,7 +379,6 @@ bot.on('ready', ()=> {
 
 bot.on('message', (msg) => {
 	if (msg.author.bot) return;
-	// if not something the bot cares about, exit out
 	if (msg.channel.type != 'dm' && msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
 		// msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
 		// 	msg.member.setNickname(`Initiate ${msg.author.username}`).then((value) => {
@@ -356,11 +391,11 @@ bot.on('message', (msg) => {
 		// });
 		msg.channel.sendMessage("Due to security reasons, automatic enlistment has been suspended. Please contact a member to join.");
 	};
-
+	// if not something the bot cares about, exit out
 	if(!msg.content.startsWith(prefix) || msg.channel.type === 'dm' || msg.channel.type != 'dm' && data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1) return;
 
 	//Trim the mention from the message and any whitespace
-	var command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
+	let command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
 	if (command.startsWith(prefix)) {
 		//Get command to execute
 		let to_execute = command.split(prefix).slice(1).join().split(' ')[0];
