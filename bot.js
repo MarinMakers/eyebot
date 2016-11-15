@@ -314,20 +314,31 @@ const commands = {
 bot.login(discord_auth.token);
 
 bot.on('ready', ()=> {
-	bot.user.setStatus("online",`Say ${prefix}help`)
-	.then(user=> console.log("Eyebot Online"));
-	let guildArr = bot.guilds.array();
-	// Join the last channel of every guild that the bot is in.
-	for (guild in guildArr) {
-		tempCollection = guildArr[guild].channels.filter((channel)=> {
-			return channel.type === "voice";
-		});
-		console.log(`${guildArr[guild].name}, ${tempCollection.array().length}`);
-		tempCollection.find("position",tempCollection.array().length-1).join().then(connection => {
-			connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
-		})
-	}
-	level = require('./nifty/level.js')(bot);
+	bot.user.setStatus(`online`,`Say ${prefix}help`)
+	.then((user)=> {
+		console.log(`${bot.timestamp()} Eyebot Online\n---`)
+	})
+	.then(()=>{
+		let guildArr = bot.guilds.array();
+		// Join the last channel of every guild that the bot is in.
+		for (guild in guildArr) {
+			// // Uncomment this to do forensics on who can control the bot.
+			// if (guildArr[guild].name.indexOf("Brotherhood")=== -1) {
+			// 	let usrArr = guildArr[guild].members.array();
+			// 	for (user in usrArr) {
+			// 		console.log(usrArr[user].user.username);
+			// 	}
+			// }
+			tempCollection = guildArr[guild].channels.filter((channel)=> {
+				return channel.type === "voice";
+			});
+			console.log(`${guildArr[guild].name}, ${tempCollection.array().length}`);
+			tempCollection.find("position",tempCollection.array().length-1).join().then(connection => {
+				connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
+			})
+		}
+		level = require('./nifty/level.js')(bot);
+	});
 })
 
 bot.on('message', (msg) => {
