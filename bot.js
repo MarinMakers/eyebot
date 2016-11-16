@@ -12,6 +12,9 @@ let queue = {};
 const fs = require('fs');
 const child_process = require('child_process');
 const yt = require('ytdl-core');
+const knex = require('knex')({
+	client: 'pg'
+})
 
 //Custom modules
 const decider = require('./nifty/decisions.js')(bot); 
