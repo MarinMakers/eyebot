@@ -1,7 +1,8 @@
 module.exports = {
 	development: {
 		client: 'pg',
-		connection: { user: 'me', database: 'bot_data' }
+		connection: { database: 'bot_data' },
+		useNullAsDefault: true
 	},
 	production: { client: 'pg', connection: process.env.DATABASE_URL }
 };
