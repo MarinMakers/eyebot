@@ -12,7 +12,10 @@ let queue = {};
 const fs = require('fs');
 const child_process = require('child_process');
 const yt = require('ytdl-core');
-
+const knex = require('knex')(require('./knexfile.js').development);
+// knex('user_data').select('*').where('user_id','1').then((rows)=> {
+// 	console.log(rows);
+// })
 //Custom modules
 const decider = require('./nifty/decisions.js')(bot); 
 const gitHelper = require('./nifty/git.js')(bot);
@@ -373,12 +376,12 @@ bot.on('ready', ()=> {
 				connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
 			})
 		}
-		level = require('./nifty/level.js')(bot);
+		level = require('./nifty/level.js')(bot,knex);
 	});
 })
 
 bot.on('message', (msg) => {
-	if (msg.author.bot) return;
+	if (msg.author.bot||msg.channel.type === 'dm' || msg.channel.type != 'dm' && data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1) return;
 	if (msg.channel.type != 'dm' && msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
 		// msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
 		// 	msg.member.setNickname(`Initiate ${msg.author.username}`).then((value) => {
@@ -392,28 +395,31 @@ bot.on('message', (msg) => {
 		msg.channel.sendMessage("Due to security reasons, automatic enlistment has been suspended. Please contact a member to join.");
 	};
 	// if not something the bot cares about, exit out
-	if(!msg.content.startsWith(prefix) || msg.channel.type === 'dm' || msg.channel.type != 'dm' && data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1) return;
-
-	//Trim the mention from the message and any whitespace
-	let command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
-	if (command.startsWith(prefix)) {
-		//Get command to execute
-		let to_execute = command.split(prefix).slice(1).join().split(' ')[0];
-		//Get string after command
-		let argument = command.split(prefix).slice(1).join().split(' ').slice(1).join(" ");
-		if (commands[to_execute]) {
-			commands[to_execute].process(msg, argument)
+	if(!msg.content.startsWith(prefix)) {
+		console.log(`${msg.author.username} - ${msg.content}`);
+		return level.msgXp(msg,3,5);
+	} else {
+		//Trim the mention from the message and any whitespace
+		let command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
+		if (command.startsWith(prefix)) {
+			//Get command to execute
+			let to_execute = command.split(prefix).slice(1).join().split(' ')[0];
+			//Get string after command
+			let argument = command.split(prefix).slice(1).join().split(' ').slice(1).join(" ");
+			if (commands[to_execute]) {
+				commands[to_execute].process(msg, argument)
+			}
+		}  else {
+			//once every x minutes, give poster y xp
+			level.msgXp(msg,3,5);
 		}
-	}  else {
-		//once every x minutes, give poster y xp
-		level.msgXp(msg,3,5);
 	}
 })
 
 bot.on('guildMemberAdd', (guild, member) => {
-	guild.channels.get(data.vaultDoorID).sendMessage(`Trespasser spotted in the area: **${member.user.username}**`);
-	member.sendMessage(data.motd);
 	console.log(`${bot.timestamp()} user ${member.username} joined channel.`)
+	guild.channels.find('position',0).sendMessage(`Trespasser spotted in the area: **${member.user.username}**`);
+	member.sendMessage(data.motd);
 })
 
 //HTTP server stuff

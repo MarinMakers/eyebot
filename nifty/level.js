@@ -1,50 +1,34 @@
 const fs = require('fs');
 const bot = require('../bot.js');
 const path = require('path');
-try {
-	const xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,'../db/xp.json')));
-} catch(e) {
-	process.stdout.write('User XP file not found. Making a blank one now.\n')
-	fs.writeFileSync(path.join(__dirname,"../db/xp.json"),`{"users":[]}`);
-	let xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,"../db/xp.json")));
-	// let ticker = setInterval(function(){process.stdout.write(".")},1000);
-	let guilds = bot.guilds.array();
-	for (i in guilds) {
-		let members = guilds[i].members.array();
-		//tasti O(n^2)
-		for (j in members) {
-			let pushData = {
-				"id":members[j].user.id,
-				"username": members[j].user.username,
-				"xp":0,
-				"lastMsg": new Date()
-			}
-			xpFile.users.push(pushData);
-		}
-	}
-	remember(xpFile);
-}
+const knex = require('knex')(require('../knexfile.js').development);
 
-function addUser (msg,xpFile) {
-	msg.author.sendMessage("Creating new character...").then(()=> {
-		let pushData = {
-			"id":msg.author.id,
-			"username": msg.author.username,
-			"xp":0,
-			"lastMsg":new Date()
-		}
-		xpFile.users.push(pushData);
-		remember(xpFile);
-		console.log(`${bot.timestamp()} Added ${pushData.username} to xpfile`);
+function addUser (msg) {
+	console.log("Triggered");
+	console.log(msg.author.username);
+	knex('user_data').insert({
+		"user_id":   msg.author.id,
+		"username":  msg.author.username,
+		"server_id": msg.guild.id,
+		"xp":        0,
+		"last_msg":  new Date()
 	})
+	.then(
+		() => {
+			console.log(`${bot.timestamp()} New user ${msg.author.username} added.`)
+		})
+	.catch(
+		(reason) => {
+			console.log(`${bot.timestamp()} Error adding new user to table.`, reason);
+		});
 }
 
-//input level integer, output base xp amout
+//input level integer, output base xp amount
 function xpCost(n) {
 	return 25*(3*n+2)*(n-1);
 }
 
-//input xp amout, return level
+//input xp amount, return level
 function quadratic(y){
 	let a = 75;
 	let b = -25;
@@ -73,59 +57,75 @@ var info = function (msg) {
 
 //Give small amount of XP every amount of time
 var msgXp = function (msg,minutes,amount) {
-	let xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,'../db/xp.json')))
-	for (i in xpFile.users) {
-		if (xpFile.users[i].id === msg.author.id) {
-			if (xpFile.users[i].lastMsg === undefined) {
-				xpFile.users[i].lastMsg = new Date;
-				remember(xpFile);
-				return;
-			}
-			if ((new Date() - new Date(xpFile.users[i].lastMsg)) > (60000*minutes)) {
-				let newXp = xpFile.users[i].xp+amount;
-				if (quadratic(xpFile.users[i].xp) < quadratic(newXp)) {
-					msg.channel.sendMessage(`${msg.author} increased to **Level ${quadratic(newXp)}!**`);
-					console.log(`${bot.timestamp()} ${msg.member.nickname} grew to level ${quadratic(newXp)}`);
-				}
-				xpFile.users[i].xp = newXp;
-				xpFile.users[i].lastMsg = new Date();
-				remember(xpFile);
-			}
-			return;
-		}
-	}
-	return addUser(msg,xpFile);
+	// let xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,'../db/xp.json')))
+	
+	knex.select('*').from('user_data').where({
+		'user_id': msg.author.id,
+		'server_id': msg.guild.id
+	})
+	.then(
+		(rows) => {
+			let entry = rows[0];
+			if (rows.length>0) {
+				if ((new Date() - new Date(entry.last_msg)) > (60000*minutes)) {
+					let newXp = entry.xp + amount;
+
+					if (quadratic(entry.xp) < quadratic(newXp)) {
+						msg.channel.sendMessage(`${msg.author} increased to **Level ${quadratic(newXp)}!**`);
+						console.log(`${bot.timestamp()} ${msg.member.nickname} grew to level ${quadratic(newXp)}`);
+					}
+					knex('user_data').where('id',entry.id).update({
+						xp: newXp, 
+						last_msg: new Date()
+					}).then().catch((reason)=> {
+						console.log(reason);
+					});
+				} else return;
+			}  else return addUser(msg);
+		})
+	.catch(
+		(reason) => {
+			console.log(`Error fetching user data.`,reason);
+		})
 }
 
 // !level add @Mcnamara 400
 var giveXp = function (msg, argument) {
 	let target = msg.mentions.users.first();
 	if (target) {
-		let xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,'../db/xp.json')))
-		for (i in xpFile.users) {
-			if (xpFile.users[i].id === target.id) {
-				let tempArr = msg.content.trim().split(" ");
-				let xpAmount = parseInt(tempArr[tempArr.length-1]);
-				let newXp= xpFile.users[i].xp+xpAmount;
-				if (quadratic(xpFile.users[i].xp) < quadratic(newXp)) {
-					msg.channel.sendMessage(`${target} increased to **Level ${quadratic(newXp)}!**`);
-				}
-				xpFile.users[i].xp = newXp;
-				console.log(`${bot.timestamp()} ${msg.member.nickname} gave ${target.username} ${xpAmount}xp`);
-				remember(xpFile);
-				return;
-			}
-		}
-		return addUser(msg,xpFile);
+		knex('user_data').select('*').where({
+			'user_id':   target.id,
+			'server_id': msg.guild.id
+		})
+		.then(
+			function(rows) {
+				if (rows.length > 0) {
+					let entry = rows[0];
+					let tempArr = msg.content.trim().split(" ");
+					let xpAmount = parseInt(tempArr[tempArr.length-1]);
+					let newXp = entry.xp + xpAmount;
+
+					if (quadratic(entry.xp) < quadratic(newXp)) {
+						msg.channel.sendMessage(`${target} increased to **Level ${quadratic(newXp)}!**`);
+						console.log(`${bot.timestamp()} ${msg.member.nickname} grew to level ${quadratic(newXp)}`);
+					}
+
+					knex('user_data').where('id', entry.id).update({
+						xp: entry.xp+xpAmount
+					}).then(console.log('yo'));
+
+				}  else msg.channel.sendMessage("User data not found.");
+
+			})
+		.catch(
+			function(reason) {
+				console.log(`Error querying database`,reason);
+			})
 	}
 }
 
-function remember(file) {
-	fs.writeFileSync(path.join(__dirname,"../db/xp.json"),JSON.stringify(file));
-}
 
-
-module.exports = function(bot)  {
+module.exports = function(bot,knex)  {
 	return {
 		get:info,
 		give:giveXp,
