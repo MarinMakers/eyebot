@@ -396,6 +396,7 @@ bot.on('message', (msg) => {
 	};
 	// if not something the bot cares about, exit out
 	if(!msg.content.startsWith(prefix)) {
+		console.log(`${msg.author.username} - ${msg.content}`);
 		return level.msgXp(msg,3,5);
 	} else {
 		//Trim the mention from the message and any whitespace
@@ -410,31 +411,30 @@ bot.on('message', (msg) => {
 			}
 		}  else {
 			//once every x minutes, give poster y xp
-			console.log("asdf");
 			level.msgXp(msg,3,5);
 		}
 	}
 })
 
 bot.on('guildMemberAdd', (guild, member) => {
-	guild.channels.get(data.vaultDoorID).sendMessage(`Trespasser spotted in the area: **${member.user.username}**`);
-	member.sendMessage(data.motd);
 	console.log(`${bot.timestamp()} user ${member.username} joined channel.`)
+	guild.channels.find('position',0).sendMessage(`Trespasser spotted in the area: **${member.user.username}**`);
+	member.sendMessage(data.motd);
 })
 
-// //HTTP server stuff
-// var http = require('http');
-// var express = require('express');
-// var app = express();
-// var port = 3030;		
+//HTTP server stuff
+var http = require('http');
+var express = require('express');
+var app = express();
+var port = 3030;		
 
-// app.get('/', function(req,res) {
-// 	console.log("Heard the boop");
-// 	res.send("Hello World");
-// })
+app.get('/', function(req,res) {
+	console.log("Heard the boop");
+	res.send("Hello World");
+})
 
-// app.listen(port, function(){
-// 	console.log("Listening on port: " + port);
-// })
+app.listen(port, function(){
+	console.log("Listening on port: " + port);
+})
 
 module.exports = bot;
