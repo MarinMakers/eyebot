@@ -1,5 +1,5 @@
 # Eyebot
-A chatbot for the [Brotherhood of Steel Discord Server](https://discord.gg/VB56Xtf)
+A chatbot for the [Brotherhood of Steel Discord Server](https://discord.gg/xsUX6Ug)
 
 ## Table of Contents:
 1. [Planned Features](#planned-features)
