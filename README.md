@@ -8,8 +8,8 @@ A chatbot for the [Brotherhood of Steel Discord Server](https://discord.gg/VB56X
 
 
 ### Planned Features
- - [ ] !propaganda - Posts misc Brotherhood of Steel propaganda
- - [ ] Music functionality
+ - [x] !propaganda - Posts misc Brotherhood of Steel propaganda
+ - [x] Music functionality
  - [ ] !file - pseudo-CLI to view contents and open resources like chat logs and reading material.
  
 ### Contributing
