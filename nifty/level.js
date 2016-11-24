@@ -130,6 +130,7 @@ module.exports = function(bot,knex)  {
 	return {
 		get:info,
 		give:giveXp,
-		msgXp:msgXp
+		msgXp:msgXp,
+		addUser:addUser
 	}
 }
