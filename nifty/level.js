@@ -4,8 +4,6 @@ const path = require('path');
 const knex = require('knex')(require('../knexfile.js').development);
 
 function addUser (msg) {
-	console.log("Triggered");
-	console.log(msg.author.username);
 	knex('user_data').insert({
 		"user_id":   msg.author.id,
 		"username":  msg.author.username,
@@ -43,22 +41,25 @@ function diff(xp) {
 
 //Retrieve info based on your character
 var info = function (msg) {
-	let xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,'../db/xp.json')))
-	for (i in xpFile.users) {
-		if (xpFile.users[i].id === msg.author.id) {
-			let xp = xpFile.users[i].xp;
+	knex.select('*').from('user_data').where({
+		'user_id': msg.author.id,
+		'server_id': msg.guild.id
+	}).then((rows)=>{
+		if (rows.length > 0) {
+			let entry = rows[0];
+			let xp = entry.xp;
 			let level = quadratic(xp);
 			msg.channel.sendMessage(`${msg.member}: **Level ${level}** - **${diff(xp)}/${xpCost(level+1) - xpCost(level)} XP**`);
-			return;
+		}  else {
+			addUser(msg);
 		}
-	}
-	return addUser(msg,xpFile);
+	}).catch((reason)=>{
+		console.log(`Error pulling user data for !level`, reason);
+	})
 }
 
 //Give small amount of XP every amount of time
 var msgXp = function (msg,minutes,amount) {
-	// let xpFile = JSON.parse(fs.readFileSync(path.join(__dirname,'../db/xp.json')))
-	
 	knex.select('*').from('user_data').where({
 		'user_id': msg.author.id,
 		'server_id': msg.guild.id
