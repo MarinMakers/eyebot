@@ -206,42 +206,44 @@ const commands = {
 		description: "Give XP to a user. Need permissions.",
 		usage: "@<username> <#>"
 	},
-	// 'update': {
-	// 	process: (msg,argument)=> {
-	// 		msg.channel.sendMessage("fetching updates...").then(function(sentMsg){
-	// 			console.log("updating...");
-	// 			var spawn = require('child_process').spawn;
-	// 			var log = function(err,stdout,stderr){
-	// 				if(stdout){console.log(stdout);}
-	// 				if(stderr){console.log(stderr);}
-	// 			};
-	// 			var fetch = spawn('git', ['fetch']);
-	// 			fetch.stdout.on('data',function(data){
-	// 				console.log(data.toString());
-	// 			});
-	// 			fetch.on("close",function(code){
-	// 				var reset = spawn('git', ['reset','--hard','origin/master']);
-	// 				reset.stdout.on('data',function(data){
-	// 					console.log(data.toString());
-	// 				});
-	// 				reset.on("close",function(code){
-	// 					var npm = spawn('npm', ['install']);
-	// 					npm.stdout.on('data',function(data){
-	// 						console.log(data.toString());
-	// 					});
-	// 					npm.on("close",function(code){
-	// 						console.log("goodbye");
-	// 						sentMsg.edit("brb!").then(function(){
-	// 							bot.destroy().then(function(){
-	// 								process.exit();
-	// 							});
-	// 						});
-	// 					});
-	// 				});
-	// 			});
-	// 		});
-	// 	}
-	// },
+	'update': {
+		process: (msg,argument)=> {
+			if (msg.author.id === "127060142935113728") {
+				msg.channel.sendMessage("fetching updates...").then(function(sentMsg){
+					console.log("updating...");
+					var spawn = require('child_process').spawn;
+					var log = function(err,stdout,stderr){
+						if(stdout){console.log(stdout);}
+						if(stderr){console.log(stderr);}
+					};
+					var fetch = spawn('git', ['fetch']);
+					fetch.stdout.on('data',function(data){
+						console.log(data.toString());
+					});
+					fetch.on("close",function(code){
+						var reset = spawn('git', ['reset','--hard','origin/master']);
+						reset.stdout.on('data',function(data){
+							console.log(data.toString());
+						});
+						reset.on("close",function(code){
+							var npm = spawn('npm', ['install']);
+							npm.stdout.on('data',function(data){
+								console.log(data.toString());
+							});
+							npm.on("close",function(code){
+								console.log("goodbye");
+								sentMsg.edit("brb!").then(function(){
+									bot.destroy().then(function(){
+										process.exit();
+									});
+								});
+							});
+						});
+					});
+				});
+			}
+		}
+	},
 	'play': {
 		process: (msg) => {
 			if (queue[msg.guild.id] === undefined) return msg.channel.sendMessage(`Add some songs to the queue first with !add`);
@@ -360,14 +362,8 @@ bot.on('ready', ()=> {
 	.then(()=>{
 		let guildArr = bot.guilds.array();
 		// Join the last channel of every guild that the bot is in.
+		console.log(`Joined servers: ${guildArr.length}`);
 		for (guild in guildArr) {
-			// // Uncomment this to do forensics on who can control the bot.
-			// if (guildArr[guild].name.indexOf("Brotherhood")=== -1) {
-			// 	let usrArr = guildArr[guild].members.array();
-			// 	for (user in usrArr) {
-			// 		console.log(usrArr[user].user.username);
-			// 	}
-			// }
 			tempCollection = guildArr[guild].channels.filter((channel)=> {
 				return channel.type === "voice";
 			});
@@ -381,24 +377,26 @@ bot.on('ready', ()=> {
 })
 
 bot.on('message', (msg) => {
-	if (msg.author.bot||msg.channel.type === 'dm' || msg.channel.type != 'dm' && data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1) return;
+	if (msg.author.bot||msg.channel.type === 'dm' || msg.channel.type != 'dm' && data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1|| msg.channel.type!='dm' && bot.checkRole(msg,"Blacklisted")) return;
 	if (msg.channel.type != 'dm' && msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
-		// msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
-		// 	msg.member.setNickname(`Initiate ${msg.author.username}`).then((value) => {
-		// 		msg.channel.sendMessage("Welcome, Initiate.");
-		// 	}, (reason) => {
-		// 		console.log(reason);
-		// 	});
-		// }, (reason) => {
-		// 	console.log(reason);
-		// });
+		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
+			msg.member.setNickname(`Initiate ${msg.author.username}`).then((value) => {
+				msg.author.sendMessage(`Welcome, ${msg.member.nickname}\n
+					Please tour our facilities. Don't hesitate to ask for help if you need it.\n
+					General group chat can be found in #general.\n
+					For the latest quests, check the quests channel. To find the most recent copy of the questbook, check the pinned messages.\n
+					\n
+					You are currently an Initiate. Reach Level 3 to become a Senior Initiate, then Level 5 to graduate to Apprentice Knight.`);
+			}, (reason) => {
+				console.log(reason);
+			});
+		}, (reason) => {
+			console.log(reason);
+		});
 		msg.channel.sendMessage("Due to security reasons, automatic enlistment has been suspended. Please contact a member to join.");
 	};
 	// if not something the bot cares about, exit out
-	if(!msg.content.startsWith(prefix)) {
-		console.log(`${msg.author.username} - ${msg.content}`);
-		return level.msgXp(msg,3,5);
-	} else {
+	if(msg.content.startsWith(prefix)) {
 		//Trim the mention from the message and any whitespace
 		let command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
 		if (command.startsWith(prefix)) {
@@ -411,7 +409,7 @@ bot.on('message', (msg) => {
 			}
 		}  else {
 			//once every x minutes, give poster y xp
-			level.msgXp(msg,3,5);
+			return level.msgXp(msg,3,5);
 		}
 	}
 })
