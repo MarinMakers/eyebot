@@ -13,9 +13,7 @@ const fs = require('fs');
 const child_process = require('child_process');
 const yt = require('ytdl-core');
 const knex = require('knex')(require('./knexfile.js').development);
-// knex('user_data').select('*').where('user_id','1').then((rows)=> {
-// 	console.log(rows);
-// })
+
 //Custom modules
 const decider = require('./nifty/decisions.js')(bot); 
 const gitHelper = require('./nifty/git.js')(bot);
@@ -247,7 +245,7 @@ const commands = {
 						console.log(data.toString());
 					});
 					fetch.on("close",function(code){
-						var reset = spawn('git', ['reset','--hard','origin/master']);
+						var reset = spawn('git', ['pull','origin/master']);
 						reset.stdout.on('data',function(data){
 							console.log(data.toString());
 						});
@@ -292,7 +290,9 @@ const commands = {
 			} else {
 				msg.channel.sendMessage("Mention a user to revoke.")
 			}
-		}
+		},
+		usage:"<@target>",
+		description: "Revoke bot privileges from target. Requires permissions."
 	},
 	'play': {
 		process: (msg) => {
