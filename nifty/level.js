@@ -125,6 +125,10 @@ var giveXp = function (msg, argument) {
 	}
 }
 
+function existsUser(user){
+	
+}
+
 
 module.exports = function(bot,knex)  {
 	return {

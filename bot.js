@@ -24,10 +24,15 @@ var level;
 
 //bot methods
 bot.checkRole = (msg, role) => {
-	let foundRole = msg.guild.roles.find('name',role);
-	 if (msg.member.roles.has(foundRole.id)){
-		return true;
-	 } else {
+	if (msg.guild.roles.find('name',role) != undefined) {
+		let foundRole = msg.guild.roles.find('name',role);
+		if (msg.member.roles.has(foundRole.id)){
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		console.log(`WARNING! Role not found: ${role}`);
 		return false;
 	}
 }
@@ -162,7 +167,28 @@ const commands = {
 	},
 	'enlist': {
 		process: (msg,argument) => {
-
+			if (bot.checkRole(msg,"Elder")||bot.checkRole(msg,"Head Scribe")||bot.checkRole(msg,"Head Paladin")||bot.checkRole(msg,"Head Knight")) {
+				if (msg.mentions.users.first() != undefined) {
+					let target = msg.guild.member(msg.mentions.users.first());
+					if (target.highestRole.name==="@everyone") {
+						target.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
+							target.setNickname(`Initiate ${target.user.username}`).then((value) => {
+								target.sendMessage("Welcome, "+ target.nickname +"\nPlease tour our facilities. Don't hesitate to ask for help if you need it.\nGeneral group chat can be found in #general.\nFor the latest quests, check the quests channel. To find the most recent copy of the questbook, check the pinned messages.\n\nYou are currently an Initiate. Reach Level 3 to become a Senior Initiate, then Level 5 to graduate to Apprentice Knight.\nFor more information, check our thread: https://nv-mp.com/forum/index.php?threads/the-brotherhood-of-steel-mojave-chapter.346/");
+							}, (reason) => {
+								console.log(reason);
+							});
+						}, (reason) => {
+							console.log(reason);
+						});
+					}  else {
+						msg.channel.sendMessage("Target is ineligible for recruitment.")
+					}
+				} else {
+					msg.channel.sendMessage("Mention a user to enlist.")
+				}
+			} else {
+				bot.reject(msg);
+			}
 		},
 		description: "Join the Brotherhood of Steel."
 	},
@@ -355,6 +381,7 @@ const commands = {
 bot.login(discord_auth.token);
 
 bot.on('ready', ()=> {
+	level = require('./nifty/level.js')(bot,knex);
 	bot.user.setStatus(`online`,`Say ${prefix}help`)
 	.then((user)=> {
 		console.log(`${bot.timestamp()} Eyebot Online\n---`)
@@ -372,12 +399,11 @@ bot.on('ready', ()=> {
 				connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
 			})
 		}
-		level = require('./nifty/level.js')(bot,knex);
 	});
 })
 
 bot.on('message', (msg) => {
-	if (msg.author.bot||msg.channel.type === 'dm' || msg.channel.type != 'dm' && data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1|| msg.channel.type!='dm' && bot.checkRole(msg,"Blacklisted")) return;
+	if (msg.author.bot||msg.system||msg.tts||msg.channel.type === 'dm' || data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1|| bot.checkRole(msg,"Blacklisted") ) return;
 	if (msg.channel.type != 'dm' && msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
 		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
 			msg.member.setNickname(`Initiate ${msg.author.username}`).then((value) => {
@@ -416,7 +442,7 @@ bot.on('message', (msg) => {
 
 bot.on('guildMemberAdd', (guild, member) => {
 	console.log(`${bot.timestamp()} user ${member.username} joined channel.`)
-	guild.channels.find('position',0).sendMessage(`Trespasser spotted in the area: **${member.user.username}**`);
+	guild.channels.find('position',0).sendMessage(`Outsider spotted in the area: **${member.user.username}**`);
 	member.sendMessage(data.motd);
 })
 
