@@ -173,7 +173,7 @@ const commands = {
 					if (target.highestRole.name==="@everyone") {
 						target.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
 							target.setNickname(`Initiate ${target.user.username}`).then((value) => {
-								target.sendMessage("Welcome, "+ target.nickname +"\nPlease tour our facilities. Don't hesitate to ask for help if you need it.\nGeneral group chat can be found in #general.\nFor the latest quests, check the quests channel. To find the most recent copy of the questbook, check the pinned messages.\n\nYou are currently an Initiate. Reach Level 3 to become a Senior Initiate, then Level 5 to graduate to Apprentice Knight.\nFor more information, check our thread: https://nv-mp.com/forum/index.php?threads/the-brotherhood-of-steel-mojave-chapter.346/");
+								target.sendMessage("Welcome, "+ target.nickname +data.welcomeMsg);
 							}, (reason) => {
 								console.log(reason);
 							});
@@ -267,6 +267,30 @@ const commands = {
 						});
 					});
 				});
+			}
+		}
+	},
+	'revoke':{
+		process: (msg)=>{
+			if (msg.mentions.users.first() != undefined) {
+				let target = msg.guild.member(msg.mentions.users.first());
+				if (target.highestRole.name === 'Elder') {
+					msg.author.addRole(msg.guild.roles.find("name", "Blacklisted").id).then((value)=>{
+						msg.channel.sendMessage("_The bot fries your hand as you attempt this treasonous act, rendering you incapable of interacting with the bot any further_");
+					})
+				} else {
+					if (bot.checkRole(msg,"Elder")||bot.checkRole(msg,"Head Scribe")||bot.checkRole(msg,"Head Paladin")||bot.checkRole(msg,"Head Knight")) {
+						target.addRole(msg.guild.roles.find("name", "Blacklisted").id).then((value) => {
+							msg.channel.sendMessage(`${target} has had their bot privileges revoked until further notice.`)
+						}, (reason) => {
+							console.log(reason);
+						});
+					} else {
+						bot.reject(msg);
+					}
+				}
+			} else {
+				msg.channel.sendMessage("Mention a user to revoke.")
 			}
 		}
 	},
@@ -404,23 +428,6 @@ bot.on('ready', ()=> {
 
 bot.on('message', (msg) => {
 	if (msg.author.bot||msg.system||msg.tts||msg.channel.type === 'dm' || data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1|| bot.checkRole(msg,"Blacklisted") ) return;
-	if (msg.channel.type != 'dm' && msg.member.highestRole.name === "@everyone" && msg.content === "!enlist") {
-		msg.member.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
-			msg.member.setNickname(`Initiate ${msg.author.username}`).then((value) => {
-				msg.author.sendMessage(`Welcome, ${msg.member.nickname}\n
-					Please tour our facilities. Don't hesitate to ask for help if you need it.\n
-					General group chat can be found in #general.\n
-					For the latest quests, check the quests channel. To find the most recent copy of the questbook, check the pinned messages.\n
-					\n
-					You are currently an Initiate. Reach Level 3 to become a Senior Initiate, then Level 5 to graduate to Apprentice Knight.`);
-			}, (reason) => {
-				console.log(reason);
-			});
-		}, (reason) => {
-			console.log(reason);
-		});
-		msg.channel.sendMessage("Due to security reasons, automatic enlistment has been suspended. Please contact a member to join.");
-	};
 	// if not something the bot cares about, exit out
 	if(msg.content.startsWith(prefix)) {
 		//Trim the mention from the message and any whitespace
