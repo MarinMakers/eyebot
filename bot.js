@@ -405,6 +405,7 @@ const commands = {
 bot.login(discord_auth.token);
 
 bot.on('ready', ()=> {
+	console.log("Hey!");
 	level = require('./nifty/level.js')(bot,knex);
 	bot.user.setStatus(`online`,`Say ${prefix}help`)
 	.then((user)=> {
