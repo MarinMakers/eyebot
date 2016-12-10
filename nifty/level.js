@@ -135,6 +135,7 @@ const lookUpID = (msg, argument) => {
 		'server_id': msg.guild.id
 	}).then((rows)=> {
 		msg.channel.sendMessage(rows[0].xp);
+		msg.channel.sendMessage(`**Level ${level}** - **${diff(xp)}/${xpCost(level+1) - xpCost(level)} XP**`);
 	}).catch((err)=>{
 		console.log(err);
 	})
