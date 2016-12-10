@@ -108,7 +108,7 @@ var giveXp = function (msg, argument) {
 
 					if (quadratic(entry.xp) < quadratic(newXp)) {
 						msg.channel.sendMessage(`${target} increased to **Level ${quadratic(newXp)}!**`);
-						console.log(`${bot.timestamp()} ${msg.member.nickname} grew to level ${quadratic(newXp)}`);
+						console.log(`${bot.timestamp()} ${msg.guild.member(target).nickname} grew to level ${quadratic(newXp)}`);
 					}
 
 					knex('user_data').where('id', entry.id).update({
@@ -126,7 +126,18 @@ var giveXp = function (msg, argument) {
 }
 
 function existsUser(user){
-	
+
+}
+
+const lookUpID = (msg, argument) => {
+	knex.select('xp').from('user_data').where({
+		'user_id':argument,
+		'server_id': msg.guild.id
+	}).then((rows)=> {
+		msg.channel.sendMessage(rows[0].xp);
+	}).catch((err)=>{
+		console.log(err);
+	})
 }
 
 
@@ -135,6 +146,7 @@ module.exports = function(bot,knex)  {
 		get:info,
 		give:giveXp,
 		msgXp:msgXp,
-		addUser:addUser
+		addUser:addUser,
+		lookUpID: lookUpID
 	}
 }

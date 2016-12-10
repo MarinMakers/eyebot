@@ -230,6 +230,11 @@ const commands = {
 		description: "Give XP to a user. Need permissions.",
 		usage: "@<username> <#>"
 	},
+	'xplu': {
+		process: (msg,argument)=> {
+			level.lookUpID(msg,argument);
+		}
+	},
 	'update': {
 		process: (msg,argument)=> {
 			if (msg.author.id === "127060142935113728") {
