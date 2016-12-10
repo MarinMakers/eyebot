@@ -134,8 +134,14 @@ const lookUpID = (msg, argument) => {
 		'user_id':argument,
 		'server_id': msg.guild.id
 	}).then((rows)=> {
-		let level = quadratic(rows[0].xp)
-		msg.channel.sendMessage(`**Level ${level}** - **${diff(xp)}/${xpCost(level+1) - xpCost(level)} XP**`);
+		if (rows.length > 0) {
+			let entry = rows[0];
+			let xp = entry.xp;
+			let level = quadratic(xp);
+			msg.channel.sendMessage(`**Level ${level}** - **${diff(xp)}/${xpCost(level+1) - xpCost(level)} XP**`);
+		}else {
+			msg.channel.sendMessage("User not found.")
+		}
 	}).catch((err)=>{
 		console.log(err);
 	})
