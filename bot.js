@@ -223,7 +223,7 @@ const commands = {
 	},
 	'xp': {
 		process: (msg,argument)=> {
-			if (bot.checkRole(msg,"Elder")||bot.checkRole(msg,"Head Scribe")||bot.checkRole(msg,"Head Paladin")||bot.checkRole(msg,"Head Knight")) {
+			if (bot.checkRole(msg,"Elder")||bot.checkRole(msg,"Head Scribe")||bot.checkRole(msg,"Head Paladin")||bot.checkRole(msg,"Head Knight")||bot.checkRole(msg,"Senior Scribe")) {
 				level.give(msg,argument);
 			}  else bot.reject(msg);
 		},
