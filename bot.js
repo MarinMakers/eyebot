@@ -404,6 +404,16 @@ const commands = {
 		},
 		description: "View music queue.",
 		discrete: true
+	},
+	'forceadd': {
+		process: (msg) => {
+			if (bot.checkRole(msg, "Elder")) {
+				let target = msg.guild.member(msg.mentions.users.first());
+				level.forceadd(taret.user.id,msg.guild.id,target.user.username)?console.log("It worked!!"):console.log("Failed to add new member");
+			}  else {
+				bot.reject(msg);
+			}
+		}
 	}
 }
 

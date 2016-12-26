@@ -147,6 +147,22 @@ const lookUpID = (msg, argument) => {
 	})
 }
 
+const forceAdd (user_id,server_id,username)=> {
+	if (knex.select('id').from('user_data').where({'user_id':user_id,'server_id': server_id}).length < 1) {
+		knex('user_data').insert({
+			"user_id":   user_id,
+			"username":  username,
+			"server_id": server_id,
+			"xp":        0,
+			"last_msg":  new Date()
+		}).then(()=> {
+			return true;
+		});
+	} else {
+		return false;
+	}
+}
+
 
 module.exports = function(bot,knex)  {
 	return {
@@ -154,6 +170,7 @@ module.exports = function(bot,knex)  {
 		give:giveXp,
 		msgXp:msgXp,
 		addUser:addUser,
-		lookUpID: lookUpID
+		lookUpID: lookUpID,
+		forceAdd: forceAdd
 	}
 }
