@@ -147,7 +147,7 @@ const lookUpID = (msg, argument) => {
 	})
 }
 
-const forceAdd (user_id,server_id,username)=> {
+const forceAdd = (user_id,server_id,username)=> {
 	if (knex.select('id').from('user_data').where({'user_id':user_id,'server_id': server_id}).length < 1) {
 		knex('user_data').insert({
 			"user_id":   user_id,
