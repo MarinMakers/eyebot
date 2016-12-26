@@ -409,7 +409,7 @@ const commands = {
 		process: (msg) => {
 			if (bot.checkRole(msg, "Elder")) {
 				let target = msg.guild.member(msg.mentions.users.first());
-				level.forceAdd(target.user.id,msg.guild.id,target.user.username)?console.log("It worked!!"):console.log("Failed to add new member");
+				level.forceAdd(target.user.id,msg.guild.id,target.user.username);
 			}  else {
 				bot.reject(msg);
 			}

@@ -148,20 +148,27 @@ const lookUpID = (msg, argument) => {
 }
 
 const forceAdd = (user_id,server_id,username)=> {
-	if (knex.select('id').from('user_data').where({'user_id':user_id,'server_id': server_id}).length < 1) {
-		knex('user_data').insert({
+	knex.select('id').from('user_data').where({'user_id':user_id,'server_id': server_id})
+	.then((rows)=> {
+		console.log(rows);
+		if (rows.length<1) {
+			knex('user_data').insert({
 			"user_id":   user_id,
 			"username":  username,
 			"server_id": server_id,
 			"xp":        0,
 			"last_msg":  new Date()
-		}).then(()=> {
-			return true;
-		});
-	} else {
-		return false;
-	}
-}
+			}).then(()=> {
+				console.log("User Added")
+				return true;
+			});
+		} else {
+			console.log("Failed to forceadd " + user_id);
+			return false;
+		}
+	})
+};
+
 
 
 module.exports = function(bot,knex)  {
