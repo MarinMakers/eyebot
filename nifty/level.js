@@ -4,6 +4,7 @@ const path = require('path');
 const knex = require('knex')(require('../knexfile.js').development);
 
 function addUser (msg) {
+	console.log("Adduser fired.");
 	knex('user_data').insert({
 		"user_id":   msg.author.id,
 		"username":  msg.author.username,
@@ -60,14 +61,16 @@ var info = function (msg) {
 
 //Give small amount of XP every amount of time
 var msgXp = function (msg,minutes,amount) {
+	console.log(`Giving msg Xp to ${msg.author}`)
 	knex.select('*').from('user_data').where({
 		'user_id': msg.author.id,
 		'server_id': msg.guild.id
 	})
 	.then(
 		(rows) => {
-			let entry = rows[0];
+			console.log(rows.length);
 			if (rows.length>0) {
+				let entry = rows[0];
 				if ((new Date() - new Date(entry.last_msg)) > (60000*minutes)) {
 					let newXp = entry.xp + amount;
 
@@ -82,7 +85,7 @@ var msgXp = function (msg,minutes,amount) {
 						console.log(reason);
 					});
 				} else return;
-			}  else return addUser(msg);
+			}  else addUser(msg);
 		})
 	.catch(
 		(reason) => {
@@ -113,7 +116,13 @@ var giveXp = function (msg, argument) {
 
 					knex('user_data').where('id', entry.id).update({
 						xp: entry.xp+xpAmount
-					}).then(console.log('yo'));
+					}).then(()=>{
+						msg.channel.sendMessage(`${xpAmount}xp given to ${msg.mentions.users.first().username}`).then((msg)=>{
+							setTimeout(()=>{
+								msg.delete();
+							}, 1000);
+						})
+					});
 
 				}  else msg.channel.sendMessage("User data not found.");
 

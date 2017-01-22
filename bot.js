@@ -21,18 +21,19 @@ const todo = require('./nifty/todo.js')(bot);
 var level;
 
 //bot methods
-bot.checkRole = (msg, role) => {
-	if (msg.guild.roles.find('name',role) != undefined) {
-		let foundRole = msg.guild.roles.find('name',role);
-		if (msg.member.roles.has(foundRole.id)){
-			return true;
+bot.checkRole = (msg, roleArr) => {
+	for (var i = roleArr.length - 1; i >= 0; i--) {
+		if (msg.guild.roles.find('name',role) != undefined) {
+			let foundRole = msg.guild.roles.find('name',roleArr[i]);
+			if (msg.member.roles.has(foundRole.id)){
+				return true;
+			}
 		} else {
+			console.log(`WARNING! Role not found: ${role}`);
 			return false;
 		}
-	} else {
-		console.log(`WARNING! Role not found: ${role}`);
-		return false;
 	}
+	return false;
 }
 bot.reject = (msg)=> {
 	msg.channel.sendCode('diff','- Access Denied\nThis incident will be reported');
@@ -55,6 +56,7 @@ var getMethod = (argument) => {
 var getParameter = (argument) => {
 	return argument.substring(argument.indexOf(' ')+1, argument.length);
 }
+
 
 const commands = {
 	'todo': {
@@ -94,7 +96,7 @@ const commands = {
 	},
 	'pull': {
 		process: (msg, argument) => {
-			if (bot.checkRole(msg, 'dev')){
+			if (bot.checkRole(msg, ['Elder'])){
 				gitHelper.pull((msg) => {
 					msg.channel.sendMessage(msg);
 				})
@@ -145,7 +147,7 @@ const commands = {
 	},
 	'kill': {
 		process: (msg, argument) => {
-			if (bot.checkRole(msg, 'Elder') || bot.checkRole(msg, 'Head Scribe')) {
+			if (bot.checkRole(msg, ['Elder','Head Scribe'])) {
 				msg.channel.sendMessage("*Beep boop, click*").then(()=> {
 					console.log("Being shut down by " + msg.author.username);
 					process.exit();
@@ -161,11 +163,11 @@ const commands = {
 		process: (msg, argument) => {
 			commands["todo"].process(msg,argument)
 		},
-		description: "Alias for !todo"
+		description: `Alias for ${prefix}todo`
 	},
 	'enlist': {
 		process: (msg,argument) => {
-			if (bot.checkRole(msg,"Elder")||bot.checkRole(msg,"Head Scribe")||bot.checkRole(msg,"Head Paladin")||bot.checkRole(msg,"Head Knight")) {
+			if (bot.checkRole(msg,["Elder","Sentinel","Head Paladin","Head Scribe","Head Knight"])) {
 				if (msg.mentions.users.first() != undefined) {
 					let target = msg.guild.member(msg.mentions.users.first());
 					if (target.highestRole.name==="@everyone") {
@@ -188,7 +190,7 @@ const commands = {
 				bot.reject(msg);
 			}
 		},
-		description: "Join the Brotherhood of Steel."
+		description: "Enlist a new member to the Brotherhood of Steel. Requires permissions."
 	},
 	'propaganda': {
 		process: (msg,argument) => {
@@ -223,7 +225,7 @@ const commands = {
 	},
 	'xp': {
 		process: (msg,argument)=> {
-			if (bot.checkRole(msg,"Elder")||bot.checkRole(msg,"Head Scribe")||bot.checkRole(msg,"Head Paladin")||bot.checkRole(msg,"Head Knight")||bot.checkRole(msg,"Senior Scribe")) {
+			if (bot.checkRole(msg,["Elder","Sentinel","Head Paladin","Head Scribe","Head Knight","Senior Scribe"])) {
 				console.log(msg.author);
 				level.give(msg,argument);
 			}  else bot.reject(msg);
@@ -283,7 +285,7 @@ const commands = {
 						msg.channel.sendMessage("_The bot fries your hand as you attempt this treasonous act, rendering you incapable of interacting with the bot any further_");
 					})
 				} else {
-					if (bot.checkRole(msg,"Elder")||bot.checkRole(msg,"Head Scribe")||bot.checkRole(msg,"Head Paladin")||bot.checkRole(msg,"Head Knight")) {
+					if (bot.checkRole(msg,["Elder","Sentinel","Head Paladin","Head Scribe","Head Knight"])) {
 						target.addRole(msg.guild.roles.find("name", "Blacklisted").id).then((value) => {
 							msg.channel.sendMessage(`${target} has had their bot privileges revoked until further notice.`)
 						}, (reason) => {
@@ -302,7 +304,7 @@ const commands = {
 	},
 	'play': {
 		process: (msg) => {
-			if (queue[msg.guild.id] === undefined) return msg.channel.sendMessage(`Add some songs to the queue first with !add`);
+			if (queue[msg.guild.id] === undefined) return msg.channel.sendMessage(`Add some songs to the queue first with ${prefix}add`);
 			if (!msg.guild.voiceConnection) {
 				return commands['join'].process(msg).then(() => {
 					commands['play'].process(msg);
@@ -346,7 +348,7 @@ const commands = {
 					} else if (m.content.startsWith(prefix + 'time')){
 						msg.channel.sendMessage(`time: ${Math.floor(dispatcher.time / 60000)}:${Math.floor((dispatcher.time % 60000)/1000) <10 ? '0'+Math.floor((dispatcher.time % 60000)/1000) : Math.floor((dispatcher.time % 60000)/1000)}`);
 					} else if (m.content.startsWith(prefix + 'loop')){
-						msg.channel.sendMessage(`Looping **${song.title}**. To exit loop, use !skip`).then(()=>{queue[msg.guild.id].looping=true})
+						msg.channel.sendMessage(`Looping **${song.title}**. To exit loop, use ${prefix}skip`).then(()=>{queue[msg.guild.id].looping=true})
 					}
 				});
 				dispatcher.on('end', () => {
@@ -407,7 +409,7 @@ const commands = {
 	},
 	'forceadd': {
 		process: (msg) => {
-			if (bot.checkRole(msg, "Elder")) {
+			if (bot.checkRole(msg, ["Elder"])) {
 				let target = msg.guild.member(msg.mentions.users.first());
 				level.forceAdd(target.user.id,msg.guild.id,target.user.username);
 			}  else {
@@ -421,7 +423,6 @@ const commands = {
 bot.login(discord_auth.token);
 
 bot.on('ready', ()=> {
-	console.log("Hey!");
 	level = require('./nifty/level.js')(bot,knex);
 	bot.user.setStatus(`online`,`Say ${prefix}help`)
 	.then((user)=> {
@@ -444,8 +445,8 @@ bot.on('ready', ()=> {
 })
 
 bot.on('message', (msg) => {
-	if (msg.author.bot||msg.system||msg.tts||msg.channel.type === 'dm' || data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1|| bot.checkRole(msg,"Blacklisted") ) return;
 	// if not something the bot cares about, exit out
+	if(msg.author.bot||msg.system||msg.tts||msg.channel.type === 'dm' || data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1|| bot.checkRole(msg,["Blacklisted"]) ) return;
 	if(msg.content.startsWith(prefix)) {
 		//Trim the mention from the message and any whitespace
 		let command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
@@ -455,7 +456,7 @@ bot.on('message', (msg) => {
 			//Get string after command
 			let argument = command.split(prefix).slice(1).join().split(' ').slice(1).join(" ");
 			if (commands[to_execute]) {
-				commands[to_execute].process(msg, argument)
+				commands[to_execute].process(msg, argument);
 			}
 		}  else {
 			//once every x minutes, give poster y xp
@@ -465,8 +466,8 @@ bot.on('message', (msg) => {
 })
 
 bot.on('guildMemberAdd', (guild, member) => {
-	console.log(`${bot.timestamp()} user ${member.username} joined channel.`)
-	guild.channels.find('position',0).sendMessage(`Outsider spotted in the area: **${member.user.username}**`);
+	console.log(`${bot.timestamp()} user ${member.user.username} joined channel.`)
+	guild.channels.find('position',0).sendMessage(`Outsider spotted in the area: {member}`);
 	member.sendMessage(data.motd);
 })
 
