@@ -415,7 +415,9 @@ const commands = {
 			}  else {
 				bot.reject(msg);
 			}
-		}
+		},
+		description: "Add users to database",
+		discrete: true
 	}
 }
 
