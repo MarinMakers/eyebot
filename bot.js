@@ -23,9 +23,10 @@ var level;
 //bot methods
 bot.checkRole = (msg, roleArr) => {
 	for (var i = roleArr.length - 1; i >= 0; i--) {
-		if (msg.guild.roles.find('name',role) != undefined) {
+		if (msg.guild.roles.find('name',roleArr[i]) != undefined) {
 			let foundRole = msg.guild.roles.find('name',roleArr[i]);
 			if (msg.member.roles.has(foundRole.id)){
+				console.log(`${msg.author.username} has role {roleArr[i]}`);
 				return true;
 			}
 		} else {
@@ -440,7 +441,7 @@ bot.on('ready', ()=> {
 			});
 			console.log(`${guildArr[guild].name}, ${tempCollection.array().length}`);
 			tempCollection.find("position",tempCollection.array().length-1).join().then(connection => {
-				connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
+				// connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
 			})
 		}
 	});
