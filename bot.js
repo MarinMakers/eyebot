@@ -30,7 +30,7 @@ bot.checkRole = (msg, roleArr) => {
 				return true;
 			}
 		} else {
-			console.log(`WARNING! Role not found: ${role}`);
+			console.log(`WARNING! Role not found: ${roleArr[i]}`);
 			return false;
 		}
 	}
@@ -331,14 +331,14 @@ const commands = {
 				collector.on('message', m => {
 					if (m.content.startsWith(prefix + 'pause')) {
 						msg.channel.sendMessage('paused').then(() => {dispatcher.pause();});
-					} else if (m.content.startsWith(prefix + 'resume')){
+					} else if (m.content.startsWith(prefix + 'resume')) {
 						msg.channel.sendMessage('resumed').then(() => {dispatcher.resume();});
-					} else if (m.content.startsWith(prefix + 'skip')){
+					} else if (m.content.startsWith(prefix + 'skip')) {
 						msg.channel.sendMessage('skipped').then(() => {
 							queue[msg.guild.id].looping=false;
 							dispatcher.end();
 						});
-					} else if (m.content.startsWith(prefix + 'volume+')){
+					} else if (m.content.startsWith(prefix + 'volume+')) {
 						if (Math.round(dispatcher.volume*50) >= 100) return msg.channel.sendMessage(`Volume: ${Math.round(dispatcher.volume*50)}%`);
 						dispatcher.setVolume(Math.min((dispatcher.volume*50 + (2*(m.content.split('+').length-1)))/50,2));
 						msg.channel.sendMessage(`Volume: ${Math.round(dispatcher.volume*50)}%`);
@@ -354,9 +354,9 @@ const commands = {
 				});
 				dispatcher.on('end', () => {
 					collector.stop();
-					if (queue[msg.guild.id].looping){
+					if (queue[msg.guild.id].looping) {
 						play(song);
-					}else{
+					}  else {
 						play(queue[msg.guild.id].songs[0]);
 					}
 				});
@@ -436,12 +436,14 @@ bot.on('ready', ()=> {
 		// Join the last channel of every guild that the bot is in.
 		console.log(`Joined servers: ${guildArr.length}`);
 		for (guild in guildArr) {
-			tempCollection = guildArr[guild].channels.filter((channel)=> {
+			initVoiceChannelCollection = guildArr[guild].channels.filter((channel)=> {
 				return channel.type === "voice";
 			});
-			console.log(`${guildArr[guild].name}, ${tempCollection.array().length}`);
-			tempCollection.find("position",tempCollection.array().length-1).join().then(connection => {
+			console.log(`${guildArr[guild].name}`);
+			initVoiceChannelCollection.find("position",initVoiceChannelCollection.array().length-1).join().then(connection => {
 				// connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
+			}).catch((err)=>{
+				console.log(err)
 			})
 		}
 	});
@@ -470,7 +472,7 @@ bot.on('message', (msg) => {
 
 bot.on('guildMemberAdd', (guild, member) => {
 	console.log(`${bot.timestamp()} user ${member.user.username} joined channel.`)
-	guild.channels.find('position',0).sendMessage(`Outsider spotted in the area: {member}`);
+	guild.channels.find('position',0).sendMessage(`Outsider spotted in the area: ${member}`);
 	member.sendMessage(data.motd);
 })
 
