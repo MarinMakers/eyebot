@@ -120,7 +120,7 @@ var giveXp = function (msg, argument) {
 						msg.channel.sendMessage(`${xpAmount}xp given to ${msg.mentions.users.first().username}`).then((msg)=>{
 							setTimeout(()=>{
 								msg.delete();
-							}, 1000);
+							}, 3000);
 						})
 					});
 
