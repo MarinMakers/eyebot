@@ -26,7 +26,7 @@ bot.checkRole = (msg, roleArr) => {
 		if (msg.guild.roles.find('name',roleArr[i]) != undefined) {
 			let foundRole = msg.guild.roles.find('name',roleArr[i]);
 			if (msg.member.roles.has(foundRole.id)){
-				console.log(`${msg.author.username} has role {roleArr[i]}`);
+				console.log(`${msg.author.username} has role ${roleArr[i]}`);
 				return true;
 			}
 		} else {
@@ -227,7 +227,6 @@ const commands = {
 	'xp': {
 		process: (msg,argument)=> {
 			if (bot.checkRole(msg,["Elder","Sentinel","Head Paladin","Head Scribe","Head Knight","Senior Scribe"])) {
-				console.log(msg.author);
 				level.give(msg,argument);
 			}  else bot.reject(msg);
 		},
