@@ -2,10 +2,10 @@
 	"serverID":"231894413276741652",
 	"vaultDoorID":"231894413276741652",
 	"prefix":"!",
-	"motd": "```diff\n==BEGIN TRANSMISSION==\n\n\"This is Elder McNamara of the Brotherhood of Steel... The Brotherhood is looking for able-bodied recruits that want to take part in restoring order to the Wasteland. If this is you, confirm onscreen and make your way to the map location. This message repeats itself.\"\n\n\n+  > ACCEPT (Go to vault-door and request enlistment)\n+  > DECLINE```",
+	"motd": "```diff\n==BEGIN TRANSMISSION==\n\n\"This is Elder de Molay of the Brotherhood of Steel... The Brotherhood is looking for able-bodied recruits that want to take part in restoring order to the Wasteland. If this is you, confirm onscreen and make your way to the map location. This message repeats itself.\"\n\n\n+  > ACCEPT (Go to vault-door and request enlistment)\n+  > DECLINE```",
 	"musicPanel": "Music Controls:```xl\n!join : Join Voice channel of msg sender\n!add : Add a valid youtube link to the queue\n!queue : Shows the current queue, up to 15 songs shown\n!play : Play the music queue if already joined to a voice channel \n```The following commands only function while the play command is running:```xl\n!pause : pauses the music\n!resume : resumes the music\n!skip : skips the playing song\n!time : Shows the playtime of the song.\n!volume+(+++) : increases volume by 2%/+\n!volume-(---) : decreases volume by 2%/-\n!loop : loop current song```",
 	"blacklistedRoles":["@everyone","Outcast"],
 	"defaultSong": "https://www.youtube.com/watch?v=trZlvpLihHk",
-	"credits": "```This Eyebot unit has been repurposed by Elder McNamara to serve the Brotherhood of Steel```",
+	"credits": "```This Eyebot unit has been repurposed by Elder de Molay to serve the Brotherhood of Steel```",
 	"welcomeMsg":"\nPlease tour our facilities. Don't hesitate to ask for help if you need it.\nGeneral group chat can be found in #general.\nFor the latest quests, check the quests channel. To find the most recent copy of the questbook, check the pinned messages.\n\nYou are currently an Initiate. Reach Level 3 to become a Senior Initiate, then Level 5 to graduate to Apprentice Knight.\nFor more information, check our thread: https://nv-mp.com/forum/index.php?threads/the-brotherhood-of-steel-mojave-chapter.346/"
 }
