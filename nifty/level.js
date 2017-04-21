@@ -3,24 +3,24 @@ const bot = require('../bot.js');
 const path = require('path');
 const knex = require('knex')(require('../knexfile.js').development);
 
-function addUser (msg) {
-	console.log("Adduser fired.");
-	knex('user_data').insert({
-		"user_id":   msg.author.id,
-		"username":  msg.author.username,
-		"server_id": msg.guild.id,
-		"xp":        0,
-		"last_msg":  new Date()
-	})
-	.then(
-		() => {
-			console.log(`${bot.timestamp()} New user ${msg.author.username} added.`)
-		})
-	.catch(
-		(reason) => {
-			console.log(`${bot.timestamp()} Error adding new user to table.`, reason);
-		});
-}
+// function addUser (msg) {
+// 	console.log("Adduser fired.");
+// 	knex('user_data').insert({
+// 		"user_id":   msg.author.id,
+// 		"username":  msg.author.username,
+// 		"server_id": msg.guild.id,
+// 		"xp":        0,
+// 		"last_msg":  new Date()
+// 	})
+// 	.then(
+// 		() => {
+// 			console.log(`${bot.timestamp()} New user ${msg.author.username} added.`)
+// 		})
+// 	.catch(
+// 		(reason) => {
+// 			console.log(`${bot.timestamp()} Error adding new user to table.`, reason);
+// 		});
+// }
 
 //input level integer, output base xp amount
 function xpCost(n) {
@@ -48,11 +48,12 @@ var info = function (msg) {
 	}).then((rows)=>{
 		if (rows.length > 0) {
 			let entry = rows[0];
-			let xp = entry.xp;
+			let xp = entry.message_xp + entry.quest_xp;
 			let level = quadratic(xp);
 			msg.channel.sendMessage(`${msg.member}: **Level ${level}** - **${diff(xp)}/${xpCost(level+1) - xpCost(level)} XP**`);
 		}  else {
-			addUser(msg);
+			msg.channel.sendMessage(`${msg.member}: **Level 0** - **0/${xpCost(2)} XP**`);
+			addUser(msg.author.id, msg.guild.id);
 		}
 	}).catch((reason)=>{
 		console.log(`Error pulling user data for !level`, reason);
@@ -61,31 +62,36 @@ var info = function (msg) {
 
 //Give small amount of XP every amount of time
 var msgXp = function (msg,minutes,amount) {
-	console.log(`Giving msg Xp to ${msg.author}`)
 	knex.select('*').from('user_data').where({
 		'user_id': msg.author.id,
 		'server_id': msg.guild.id
 	})
 	.then(
 		(rows) => {
-			console.log(rows.length);
 			if (rows.length>0) {
 				let entry = rows[0];
 				if ((new Date() - new Date(entry.last_msg)) > (60000*minutes)) {
-					let newXp = entry.xp + amount;
+					let xp = entry.message_xp + entry.quest_xp;
+					let newXp = xp + amount;
 
-					if (quadratic(entry.xp) < quadratic(newXp)) {
+					if (quadratic(xp) < quadratic(newXp)) {
 						msg.channel.sendMessage(`${msg.author} increased to **Level ${quadratic(newXp)}!**`);
 						console.log(`${bot.timestamp()} ${msg.member.nickname} grew to level ${quadratic(newXp)}`);
 					}
 					knex('user_data').where('id',entry.id).update({
-						xp: newXp, 
+						message_xp: entry.message_xp+amount, 
 						last_msg: new Date()
-					}).then().catch((reason)=> {
+					})
+					.then(()=>{
+					})
+					.catch((reason)=> {
 						console.log(reason);
 					});
-				} else return;
-			}  else addUser(msg);
+				}  else return;
+			}  else  {
+				console.log("User not found");
+				addUser(msg.author.id,msg.guild.id);
+			}
 		})
 	.catch(
 		(reason) => {
@@ -107,15 +113,18 @@ var giveXp = function (msg, argument) {
 					let entry = rows[0];
 					let tempArr = msg.content.trim().split(" ");
 					let xpAmount = parseInt(tempArr[tempArr.length-1]);
-					let newXp = entry.xp + xpAmount;
+					let oldTotalXp = entry.quest_xp + entry.message_xp;
+					let newQuestXp = entry.quest_xp + xpAmount;
+					let newTotalXp = newQuestXp+entry.message_xp;
 
-					if (quadratic(entry.xp) < quadratic(newXp)) {
-						msg.channel.sendMessage(`${target} increased to **Level ${quadratic(newXp)}!**`);
-						console.log(`${bot.timestamp()} ${msg.guild.member(target).nickname} grew to level ${quadratic(newXp)}`);
+
+					if (quadratic(oldTotalXp) < quadratic(newTotalXp)) {
+						msg.channel.sendMessage(`${target} increased to **Level ${quadratic(newTotalXp)}!**`);
+						console.log(`${bot.timestamp()} ${msg.guild.member(target).nickname} grew to level ${quadratic(newTotalXp)}`);
 					}
 
 					knex('user_data').where('id', entry.id).update({
-						xp: entry.xp+xpAmount
+						quest_xp: newQuestXp
 					}).then(()=>{
 						msg.channel.sendMessage(`${xpAmount}xp given to ${msg.mentions.users.first().username}`).then((msg)=>{
 							setTimeout(()=>{
@@ -139,16 +148,16 @@ function existsUser(user){
 }
 
 const lookUpID = (msg, argument) => {
-	knex.select('xp').from('user_data').where({
+	knex.select('*').from('user_data').where({
 		'user_id':argument,
 		'server_id': msg.guild.id
 	}).then((rows)=> {
 		if (rows.length > 0) {
 			let entry = rows[0];
-			let xp = entry.xp;
+			let xp = entry.quest_xp + entry.message_xp;
 			let level = quadratic(xp);
 			msg.channel.sendMessage(`**Level ${level}** - **${diff(xp)}/${xpCost(level+1) - xpCost(level)} XP**`);
-		}else {
+		}  else {
 			msg.channel.sendMessage("User not found.")
 		}
 	}).catch((err)=>{
@@ -156,22 +165,24 @@ const lookUpID = (msg, argument) => {
 	})
 }
 
-const forceAdd = (user_id,server_id,username)=> {
+const addUser = (user_id, server_id/*, username*/)=> {
+	//user_id,server_id,username
+	console.log("Adding user ",user_id)
 	knex.select('id').from('user_data').where({'user_id':user_id,'server_id': server_id})
 	.then((rows)=> {
-		console.log(rows);
 		if (rows.length<1) {
 			knex('user_data').insert({
-			"user_id":   user_id,
-			"username":  username,
-			"server_id": server_id,
-			"xp":        0,
-			"last_msg":  new Date()
+			"user_id":   		user_id,
+			//"username":  username,
+			"server_id": 		server_id,
+			"quest_xp": 		0,
+			"message_xp":  		0,
+			"last_msg":  		new Date()
 			}).then(()=> {
 				console.log("User Added")
 				return true;
 			});
-		} else {
+		}  else {
 			console.log("Failed to forceadd " + user_id);
 			return false;
 		}
@@ -186,7 +197,6 @@ module.exports = function(bot,knex)  {
 		give:giveXp,
 		msgXp:msgXp,
 		addUser:addUser,
-		lookUpID: lookUpID,
-		forceAdd: forceAdd
+		lookUpID: lookUpID
 	}
 }

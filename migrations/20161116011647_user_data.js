@@ -5,7 +5,8 @@ exports.up = function(knex, Promise) {
 		table.string('user_id');
 		table.string('username');
 		table.string('server_id');
-		table.integer('xp');
+		table.integer('quest_xp');
+		table.integer('message_xp');
 		table.dateTime('last_msg');
 	})
 };

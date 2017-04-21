@@ -24,9 +24,9 @@ var level;
 const masterID = "127060142935113728";
 
 //bot methods
-bot.checkRole = (msg, roleArr) => {
-	if (msg.author.id == masterID) return true;
-
+bot.checkRole = (msg, roleArr,ignore) => {
+	if (ignore) return false;
+	if (msg.author.id === masterID) return true;
 	for (var i = roleArr.length - 1; i >= 0; i--) {
 		if (msg.guild.roles.find('name',roleArr[i]) != undefined) {
 			let foundRole = msg.guild.roles.find('name',roleArr[i]);
@@ -41,6 +41,7 @@ bot.checkRole = (msg, roleArr) => {
 	}
 	return false;
 }
+
 bot.reject = (msg)=> {
 	msg.channel.sendCode('diff','- Access Denied\nThis incident will be reported');
 	console.log(`${bot.timestamp()} ${msg.member.nickname} tried to use the command ${msg.cleanContent}`)
@@ -245,7 +246,7 @@ const commands = {
 	},
 	'update': {
 		process: (msg,argument)=> {
-			if (msg.author.id === "127060142935113728") {
+			if (msg.author.id === masterID) {
 				msg.channel.sendMessage("fetching updates...").then(function(sentMsg){
 					console.log("updating...");
 					var spawn = require('child_process').spawn;
@@ -416,7 +417,7 @@ const commands = {
 		process: (msg) => {
 			if (bot.checkRole(msg, ["Elder", "High Command"])) {
 				let target = msg.guild.member(msg.mentions.users.first());
-				level.forceAdd(target.user.id,msg.guild.id,target.user.username);
+				level.addUser(target.user.id, msg.guild.id);
 			}  else {
 				bot.reject(msg);
 			}
@@ -457,7 +458,7 @@ bot.on('ready', ()=> {
 
 bot.on('message', (msg) => {
 	// if not something the bot cares about, exit out
-	if(msg.author.bot||msg.system||msg.tts||msg.channel.type === 'dm' || data.blacklistedRoles.indexOf(msg.member.highestRole.name) != -1|| bot.checkRole(msg,["Blacklisted"]) ) return;
+	if(msg.author.bot||msg.system||msg.tts||msg.channel.type === 'dm' || bot.checkRole(msg,["Blacklisted"],true) ) return;
 	if(msg.content.startsWith(prefix)) {
 		//Trim the mention from the message and any whitespace
 		let command = msg.content.substring(msg.content.indexOf(prefix),msg.content.length).trim();
@@ -469,10 +470,12 @@ bot.on('message', (msg) => {
 			if (commands[to_execute]) {
 				commands[to_execute].process(msg, argument);
 			}
-		}  else {
-			//once every x minutes, give poster y xp
-			return level.msgXp(msg,3,5);
-		}
+		}  
+	}  else {
+		//once every x minutes, give poster y xp
+		console.log(msg.content);
+		level.msgXp(msg,3,5);
+		return;
 	}
 })
 
