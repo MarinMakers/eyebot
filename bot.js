@@ -473,8 +473,7 @@ bot.on('message', (msg) => {
 		}  
 	}  else {
 		//once every x minutes, give poster y xp
-		console.log(msg.content);
-		level.msgXp(msg,3,5);
+		level.msgXp(msg,5,3);
 		return;
 	}
 })
