@@ -20,8 +20,13 @@ const gitHelper = require('./nifty/git.js')(bot);
 const todo = require('./nifty/todo.js')(bot);
 var level;
 
+//My ID ;)
+const masterID = "127060142935113728";
+
 //bot methods
 bot.checkRole = (msg, roleArr) => {
+	if (msg.author.id == masterID) return true;
+
 	for (var i = roleArr.length - 1; i >= 0; i--) {
 		if (msg.guild.roles.find('name',roleArr[i]) != undefined) {
 			let foundRole = msg.guild.roles.find('name',roleArr[i]);
@@ -168,7 +173,7 @@ const commands = {
 	},
 	'enlist': {
 		process: (msg,argument) => {
-			if (bot.checkRole(msg,["Elder","Sentinel","Head Paladin","Head Scribe","Head Knight"])) {
+			if (bot.checkRole(msg,["Elder","High Command"])) {
 				if (msg.mentions.users.first() != undefined) {
 					let target = msg.guild.member(msg.mentions.users.first());
 					if (target.highestRole.name==="@everyone") {
@@ -226,7 +231,7 @@ const commands = {
 	},
 	'xp': {
 		process: (msg,argument)=> {
-			if (bot.checkRole(msg,["Elder","Sentinel","Head Paladin","Head Scribe","Head Knight","Senior Scribe"])) {
+			if (bot.checkRole(msg,["Elder","High Command"])) {
 				level.give(msg,argument);
 			}  else bot.reject(msg);
 		},
@@ -285,7 +290,7 @@ const commands = {
 						msg.channel.sendMessage("_The bot fries your hand as you attempt this treasonous act, rendering you incapable of interacting with the bot any further_");
 					})
 				} else {
-					if (bot.checkRole(msg,["Elder","Sentinel","Head Paladin","Head Scribe","Head Knight"])) {
+					if (bot.checkRole(msg,["Elder","High Command"])) {
 						target.addRole(msg.guild.roles.find("name", "Blacklisted").id).then((value) => {
 							msg.channel.sendMessage(`${target} has had their bot privileges revoked until further notice.`)
 						}, (reason) => {
@@ -409,7 +414,7 @@ const commands = {
 	},
 	'forceadd': {
 		process: (msg) => {
-			if (bot.checkRole(msg, ["Elder"])) {
+			if (bot.checkRole(msg, ["Elder", "High Command"])) {
 				let target = msg.guild.member(msg.mentions.users.first());
 				level.forceAdd(target.user.id,msg.guild.id,target.user.username);
 			}  else {
@@ -442,9 +447,11 @@ bot.on('ready', ()=> {
 			initVoiceChannelCollection.find("position",initVoiceChannelCollection.array().length-1).join().then(connection => {
 				// connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
 			}).catch((err)=>{
-				console.log(err)
+				console.log(err);
 			})
 		}
+	}).catch((err) =>{
+		console.log(err);
 	});
 })
 
