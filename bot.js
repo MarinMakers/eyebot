@@ -197,7 +197,7 @@ const commands = {
 				bot.reject(msg);
 			}
 		},
-		description: "Enlist a new member to the Brotherhood of Steel. Requires permissions."
+		description: "Enlist a new member to the faction. Requires permissions."
 	},
 	'propaganda': {
 		process: (msg,argument) => {
@@ -480,7 +480,7 @@ bot.on('message', (msg) => {
 
 bot.on('guildMemberAdd', (guild, member) => {
 	console.log(`${bot.timestamp()} user ${member.user.username} joined channel.`)
-	guild.channels.find('position',0).sendMessage(`Outsider spotted in the area: ${member}`);
+	guild.defaultChannel.sendMessage(`Outsider spotted in the area: ${member}`);
 	member.sendMessage(data.motd);
 })
 
