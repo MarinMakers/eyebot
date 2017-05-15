@@ -1,3 +1,5 @@
+//This line should be in the next commit
+
 //This is the main script for the bot. To start the bot, run this script with node
 const Discord = require("discord.js");
 const discord_auth = require('./auth.json');
