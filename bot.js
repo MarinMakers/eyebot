@@ -13,10 +13,10 @@ const fs = require('fs');
 const child_process = require('child_process');
 const yt = require('ytdl-core');
 const knex = require('knex')(require('./knexfile.js').development);
+const git = require('simple-git')(__dirname);
 
 //Custom modules
 const decider = require('./nifty/decisions.js')(bot); 
-const gitHelper = require('./nifty/git.js')(bot);
 const todo = require('./nifty/todo.js')(bot);
 var level;
 
@@ -42,7 +42,7 @@ bot.checkRole = (msg, roleArr,ignore) => {
 	return false;
 }
 
-bot.reject = (msg)=> {
+bot.reject = (msg) => {
 	msg.channel.sendCode('diff','- Access Denied\nThis incident will be reported');
 	console.log(`${bot.timestamp()} ${msg.member.nickname} tried to use the command ${msg.cleanContent}`)
 }
@@ -155,7 +155,7 @@ const commands = {
 	'kill': {
 		process: (msg, argument) => {
 			if (bot.checkRole(msg, ['Elder','Head Scribe'])) {
-				msg.channel.sendMessage("*Beep boop, click*").then(()=> {
+				msg.channel.sendMessage("*Beep boop, click*").then(() => {
 					console.log("Being shut down by " + msg.author.username);
 					process.exit();
 				});
@@ -205,7 +205,7 @@ const commands = {
 				if (err) {
 					msg.channel.sendMessage("No assets found.");
 				}  else {
-					files = files.filter((file)=> {
+					files = files.filter((file) => {
 						return file.substring(0,1) != '.';
 					});
 					msg.channel.sendFile('assets/images/'+ files[Math.floor(Math.random()*files.length)]);
@@ -223,7 +223,7 @@ const commands = {
 		description: "Credits for the bot."
 	},
 	'level': {
-		process: (msg,argument)=>{
+		process: (msg,argument) =>{
 			if (msg.content.split(" ").length = 1) {
 				level.get(msg);
 			}
@@ -231,7 +231,7 @@ const commands = {
 		description: "View your level"
 	},
 	'xp': {
-		process: (msg,argument)=> {
+		process: (msg,argument) => {
 			if (bot.checkRole(msg,["Elder","Council"])) {
 				level.give(msg,argument);
 			}  else bot.reject(msg);
@@ -240,54 +240,63 @@ const commands = {
 		usage: "@<username> <#>"
 	},
 	'xplu': {
-		process: (msg,argument)=> {
+		process: (msg,argument) => {
 			level.lookUpID(msg,argument);
 		}
 	},
 	'update': {
-		process: (msg,argument)=> {
+		process: (msg,argument) => {
 			if (msg.author.id === masterID) {
-				msg.channel.sendMessage("fetching updates...").then(function(sentMsg){
+				msg.channel.sendMessage("fetching updates...").then( (sentMsg) => {
 					console.log("updating...");
-					var spawn = require('child_process').spawn;
-					var log = function(err,stdout,stderr){
-						if(stdout){console.log(stdout);}
-						if(stderr){console.log(stderr);}
-					};
-					var fetch = spawn('git', ['fetch']);
-					fetch.stdout.on('data',function(data){
-						console.log(data.toString());
-					});
-					fetch.on("close",function(code){
-						var reset = spawn('git', ['pull','origin/master']);
-						reset.stdout.on('data',function(data){
-							console.log(data.toString());
-						});
-						reset.on("close",function(code){
-							var npm = spawn('npm', ['install']);
-							npm.stdout.on('data',function(data){
-								console.log(data.toString());
-							});
-							npm.on("close",function(code){
-								console.log("goodbye");
-								sentMsg.edit("brb!").then(function(){
-									bot.destroy().then(function(){
-										process.exit();
-									});
-								});
-							});
-						});
-					});
+					git.pull( (err,update) => {
+						if (update && update.summary.changes) {
+							console.log("Update found")
+							child_process.exec("npm restart");
+						}
+					}).then( () => {
+						console.log("Done.")
+					})
+
+					// var spawn = require('child_process').spawn;
+					// var log = function(err,stdout,stderr){
+					// 	if(stdout){console.log(stdout);}
+					// 	if(stderr){console.log(stderr);}
+					// };
+					// var fetch = spawn('git', ['fetch']);
+					// fetch.stdout.on('data',function(data){
+					// 	console.log(data.toString());
+					// });
+					// fetch.on("close",function(code){
+					// 	var reset = spawn('git', ['pull','origin/master']);
+					// 	reset.stdout.on('data',function(data){
+					// 		console.log(data.toString());
+					// 	});
+					// 	reset.on("close",function(code){
+					// 		var npm = spawn('npm', ['install']);
+					// 		npm.stdout.on('data',function(data){
+					// 			console.log(data.toString());
+					// 		});
+					// 		npm.on("close",function(code){
+					// 			console.log("goodbye");
+					// 			sentMsg.edit("brb!").then(function(){
+					// 				bot.destroy().then(function(){
+					// 					process.exit();
+					// 				});
+					// 			});
+					// 		});
+					// 	});
+					// });
 				});
 			}
 		}
 	},
 	'revoke':{
-		process: (msg)=>{
+		process: (msg) =>{
 			if (msg.mentions.users.first() != undefined) {
 				let target = msg.guild.member(msg.mentions.users.first());
 				if (target.highestRole.name === 'Elder') {
-					msg.author.addRole(msg.guild.roles.find("name", "Blacklisted").id).then((value)=>{
+					msg.author.addRole(msg.guild.roles.find("name", "Blacklisted").id).then((value) =>{
 						msg.channel.sendMessage("_The bot fries your hand as you attempt this treasonous act, rendering you incapable of interacting with the bot any further_");
 					})
 				} else {
@@ -354,7 +363,7 @@ const commands = {
 					} else if (m.content.startsWith(prefix + 'time')){
 						msg.channel.sendMessage(`time: ${Math.floor(dispatcher.time / 60000)}:${Math.floor((dispatcher.time % 60000)/1000) <10 ? '0'+Math.floor((dispatcher.time % 60000)/1000) : Math.floor((dispatcher.time % 60000)/1000)}`);
 					} else if (m.content.startsWith(prefix + 'loop')){
-						msg.channel.sendMessage(`Looping **${song.title}**. To exit loop, use ${prefix}skip`).then(()=>{queue[msg.guild.id].looping=true})
+						msg.channel.sendMessage(`Looping **${song.title}**. To exit loop, use ${prefix}skip`).then(() =>{queue[msg.guild.id].looping=true})
 					}
 				});
 				dispatcher.on('end', () => {
@@ -430,24 +439,24 @@ const commands = {
 
 bot.login(discord_auth.token);
 
-bot.on('ready', ()=> {
+bot.on('ready', () => {
 	level = require('./nifty/level.js')(bot,knex);
 	bot.user.setStatus(`online`,`Say ${prefix}help`)
-	.then((user)=> {
+	.then((user) => {
 		console.log(`${bot.timestamp()} Eyebot Online\n---`)
 	})
-	.then(()=>{
+	.then(() =>{
 		let guildArr = bot.guilds.array();
 		// Join the last channel of every guild that the bot is in.
 		console.log(`Joined servers: ${guildArr.length}`);
 		for (guild in guildArr) {
-			initVoiceChannelCollection = guildArr[guild].channels.filter((channel)=> {
+			initVoiceChannelCollection = guildArr[guild].channels.filter((channel) => {
 				return channel.type === "voice";
 			});
 			console.log(`${guildArr[guild].name}`);
 			initVoiceChannelCollection.find("position",initVoiceChannelCollection.array().length-1).join().then(connection => {
 				// connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
-			}).catch((err)=>{
+			}).catch((err) =>{
 				console.log(err);
 			})
 		}

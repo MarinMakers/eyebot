@@ -45,7 +45,7 @@ var info = function (msg) {
 	knex.select('*').from('user_data').where({
 		'user_id': msg.author.id,
 		'server_id': msg.guild.id
-	}).then((rows)=>{
+	}).then((rows) =>{
 		if (rows.length > 0) {
 			let entry = rows[0];
 			let xp = entry.message_xp + entry.quest_xp;
@@ -55,7 +55,7 @@ var info = function (msg) {
 			msg.channel.sendMessage(`${msg.member}: **Level 0** - **0/${xpCost(2)} XP**`);
 			addUser(msg.author.id, msg.guild.id);
 		}
-	}).catch((reason)=>{
+	}).catch((reason) =>{
 		console.log(`Error pulling user data for !level`, reason);
 	})
 }
@@ -82,9 +82,9 @@ var msgXp = function (msg,minutes,amount) {
 						message_xp: entry.message_xp+amount, 
 						last_msg: new Date()
 					})
-					.then(()=>{
+					.then(() =>{
 					})
-					.catch((reason)=> {
+					.catch((reason) => {
 						console.log(reason);
 					});
 				}  else return;
@@ -125,9 +125,9 @@ var giveXp = function (msg, argument) {
 
 					knex('user_data').where('id', entry.id).update({
 						quest_xp: newQuestXp
-					}).then(()=>{
-						msg.channel.sendMessage(`${xpAmount}xp given to ${msg.mentions.users.first().username}`).then((msg)=>{
-							setTimeout(()=>{
+					}).then(() =>{
+						msg.channel.sendMessage(`${xpAmount}xp given to ${msg.mentions.users.first().username}`).then((msg) =>{
+							setTimeout(() =>{
 								msg.delete();
 							}, 3000);
 						})
@@ -151,7 +151,7 @@ const lookUpID = (msg, argument) => {
 	knex.select('*').from('user_data').where({
 		'user_id':argument,
 		'server_id': msg.guild.id
-	}).then((rows)=> {
+	}).then((rows) => {
 		if (rows.length > 0) {
 			let entry = rows[0];
 			let xp = entry.quest_xp + entry.message_xp;
@@ -160,16 +160,16 @@ const lookUpID = (msg, argument) => {
 		}  else {
 			msg.channel.sendMessage("User not found.")
 		}
-	}).catch((err)=>{
+	}).catch((err) =>{
 		console.log(err);
 	})
 }
 
-const addUser = (user_id, server_id/*, username*/)=> {
+const addUser = (user_id, server_id/*, username*/) => {
 	//user_id,server_id,username
 	console.log("Adding user ",user_id)
 	knex.select('id').from('user_data').where({'user_id':user_id,'server_id': server_id})
-	.then((rows)=> {
+	.then((rows) => {
 		if (rows.length<1) {
 			knex('user_data').insert({
 			"user_id":   		user_id,
@@ -178,7 +178,7 @@ const addUser = (user_id, server_id/*, username*/)=> {
 			"quest_xp": 		0,
 			"message_xp":  		0,
 			"last_msg":  		new Date()
-			}).then(()=> {
+			}).then(() => {
 				console.log("User Added")
 				return true;
 			});
