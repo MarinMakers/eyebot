@@ -174,7 +174,7 @@ const commands = {
 	},
 	'enlist': {
 		process: (msg,argument) => {
-			if (bot.checkRole(msg,["Elder","High Command"])) {
+			if (bot.checkRole(msg,["Elder","Council"])) {
 				if (msg.mentions.users.first() != undefined) {
 					let target = msg.guild.member(msg.mentions.users.first());
 					if (target.highestRole.name==="@everyone") {
@@ -232,7 +232,7 @@ const commands = {
 	},
 	'xp': {
 		process: (msg,argument)=> {
-			if (bot.checkRole(msg,["Elder","High Command"])) {
+			if (bot.checkRole(msg,["Elder","Council"])) {
 				level.give(msg,argument);
 			}  else bot.reject(msg);
 		},
@@ -291,7 +291,7 @@ const commands = {
 						msg.channel.sendMessage("_The bot fries your hand as you attempt this treasonous act, rendering you incapable of interacting with the bot any further_");
 					})
 				} else {
-					if (bot.checkRole(msg,["Elder","High Command"])) {
+					if (bot.checkRole(msg,["Elder","Council"])) {
 						target.addRole(msg.guild.roles.find("name", "Blacklisted").id).then((value) => {
 							msg.channel.sendMessage(`${target} has had their bot privileges revoked until further notice.`)
 						}, (reason) => {
@@ -415,7 +415,7 @@ const commands = {
 	},
 	'forceadd': {
 		process: (msg) => {
-			if (bot.checkRole(msg, ["Elder", "High Command"])) {
+			if (bot.checkRole(msg, ["Elder", "Council"])) {
 				let target = msg.guild.member(msg.mentions.users.first());
 				level.addUser(target.user.id, msg.guild.id);
 			}  else {
