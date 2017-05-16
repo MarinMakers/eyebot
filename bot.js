@@ -423,6 +423,14 @@ const commands = {
 		},
 		description: "Add users to database",
 		discrete: true
+	},
+	'pang': {
+		process: (msg, argument) => {
+			msg.channel.sendMessage(msg.author + " paaang!");
+			console.log(`${bot.timestamp()} ${msg.author.username} pinged the bot`);
+		},
+		description: "Check if the bot is online.",
+		discrete: true
 	}
 }
 
