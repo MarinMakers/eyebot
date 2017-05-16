@@ -241,8 +241,11 @@ const commands = {
 					git.pull( (err,update) => {
 						if (update && update.summary.changes) {
 							console.log("Update found")
-							child_process.exec("npm restart");
-							process.exit(0);
+							sentMsg.delete().then(()=>{
+								msg.channel.sendMessage(update.summary.changes).then(()=>{
+									process.exit(0);
+								})
+							})
 						}
 					}).then( () => {
 						console.log("Done.")
@@ -422,14 +425,6 @@ const commands = {
 			}
 		},
 		description: "Add users to database",
-		discrete: true
-	},
-	'pang': {
-		process: (msg, argument) => {
-			msg.channel.sendMessage(msg.author + " paaang!");
-			console.log(`${bot.timestamp()} ${msg.author.username} pinged the bot`);
-		},
-		description: "Check if the bot is online.",
 		discrete: true
 	}
 }
