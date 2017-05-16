@@ -103,19 +103,6 @@ const commands = {
 		},
 		description: "Check if the bot is online."
 	},
-	'pull': {
-		process: (msg, argument) => {
-			if (bot.checkRole(msg, ['Elder'])){
-				gitHelper.pull((msg) => {
-					msg.channel.sendMessage(msg);
-				})
-			}else{
-				bot.reject(msg);
-			}
-		},
-		description: "Pulls the bot's code from github on to the server. You must have the role 'developer' to use this functionality.",
-		discrete:true
-	},
 	'help': {
 		process: (msg, argument) => {
 			let commandList = 'Available Commands:```'
@@ -255,6 +242,7 @@ const commands = {
 						if (update && update.summary.changes) {
 							console.log("Update found")
 							child_process.exec("npm restart");
+							process.exit(0);
 						}
 					}).then( () => {
 						console.log("Done.")
