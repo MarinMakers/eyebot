@@ -334,7 +334,7 @@ const commands = {
 				}
 				try {
 					dispatcher = msg.guild.voiceConnection.playStream(yt(song.url, { audioonly: true }), { passes : 1 });
-				} catch{
+				} catch(err){
 					msg.channel.sendMessage("Issue playing music... Terminating request.");
 					return;
 				}
