@@ -332,7 +332,12 @@ const commands = {
 				if (!queue[msg.guild.id].looping && song.title != undefined){
 					msg.channel.sendMessage(`Playing: **${song.title}** as requested by: **${song.requester}**`);
 				}
-				dispatcher = msg.guild.voiceConnection.playStream(yt(song.url, { audioonly: true }), { passes : 1 });
+				try {
+					dispatcher = msg.guild.voiceConnection.playStream(yt(song.url, { audioonly: true }), { passes : 1 });
+				} catch{
+					msg.channel.sendMessage("Issue playing music... Terminating request.");
+					return;
+				}
 				queue[msg.guild.id].songs.shift();
 				let collector = msg.channel.createCollector(m => m);
 				collector.on('message', m => {
@@ -448,7 +453,7 @@ bot.on('ready', () => {
 			});
 			console.log(`${guildArr[guild].name}`);
 			initVoiceChannelCollection.find("position",initVoiceChannelCollection.array().length-1).join().then(connection => {
-				// connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
+				connection.playStream(yt(data.defaultSong, { audioonly: true }), { passes : 1 });
 			}).catch((err) =>{
 				console.log(err);
 			})
