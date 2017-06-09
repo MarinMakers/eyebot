@@ -130,12 +130,12 @@ const lookUpID = (msg, argument) => {
 		'server_id': msg.guild.id
 	}).then((rows) => {
 		if (rows.length > 0) {
-			let target = bot.users.get(entry.user_id)
+			//let target = bot.users.get(entry.user_id)
 			console.log(target)
 			let entry = rows[0];
 			let xp = entry.quest_xp + entry.message_xp;
 			let level = quadratic(xp);
-			msg.channel.sendMessage(`${target.username}\n**Level ${level}** - **${diff(xp)}/${xpCost(level+1) - xpCost(level)} XP**\nMessage XP: ${entry.message_xp}\nQuest XP: ${entry.quest_xp}`);
+			msg.channel.sendMessage(`${/*target.username*/}\n**Level ${level}** - **${diff(xp)}/${xpCost(level+1) - xpCost(level)} XP**\nMessage XP: ${entry.message_xp}\nQuest XP: ${entry.quest_xp}`);
 		}  else {
 			msg.channel.sendMessage("User not found.")
 		}
