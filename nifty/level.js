@@ -3,25 +3,6 @@ const bot = require('../bot.js');
 const path = require('path');
 const knex = require('knex')(require('../knexfile.js').development);
 
-// function addUser (msg) {
-// 	console.log("Adduser fired.");
-// 	knex('user_data').insert({
-// 		"user_id":   msg.author.id,
-// 		"username":  msg.author.username,
-// 		"server_id": msg.guild.id,
-// 		"xp":        0,
-// 		"last_msg":  new Date()
-// 	})
-// 	.then(
-// 		() => {
-// 			console.log(`${bot.timestamp()} New user ${msg.author.username} added.`)
-// 		})
-// 	.catch(
-// 		(reason) => {
-// 			console.log(`${bot.timestamp()} Error adding new user to table.`, reason);
-// 		});
-// }
-
 //input level integer, output base xp amount
 function xpCost(n) {
 	return 25*(3*n+2)*(n-1);
@@ -143,10 +124,6 @@ var giveXp = function (msg, argument) {
 	}
 }
 
-function existsUser(user){
-
-}
-
 const lookUpID = (msg, argument) => {
 	knex.select('*').from('user_data').where({
 		'user_id':argument,
@@ -154,6 +131,7 @@ const lookUpID = (msg, argument) => {
 	}).then((rows) => {
 		if (rows.length > 0) {
 			let target = bot.users.get(entry.user_id)
+			console.log(target)
 			let entry = rows[0];
 			let xp = entry.quest_xp + entry.message_xp;
 			let level = quadratic(xp);
@@ -174,7 +152,6 @@ const addUser = (user_id, server_id/*, username*/) => {
 		if (rows.length<1) {
 			knex('user_data').insert({
 			"user_id":   		user_id,
-			//"username":  username,
 			"server_id": 		server_id,
 			"quest_xp": 		0,
 			"message_xp":  		0,
