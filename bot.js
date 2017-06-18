@@ -292,14 +292,24 @@ const commands = {
 				
 				var http = require('http');
 				var options = {
-					'host' : 'http://www.marketwatch.com/',
-					'port' : 80,
-					'path' : 'game/sol-investments'
-				}
-				http.get(options, function(res) {
-					console.log(res);
-					
-				})
+  host: 'www.marketwatch.com',
+  port: 80,
+  path: '/game/sol-investments'
+};
+
+http.get(options, function(res) {
+  var body = '';
+  res.on('data', function(chunk) {
+    body += chunk;
+  });
+  res.on('end', function() {
+    let $ = cheerio.load(body);
+	  console.log($)
+	  // Next time you get to a terminal, figure out which selector you need.
+  });
+}).on('error', function(e) {
+  console.log("Got error: " + e.message);
+}); 
 			}
 			catch(err){
 				msg.channel.sendMessage(err)
