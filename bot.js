@@ -16,6 +16,7 @@ const child_process = require('child_process');
 const yt = require('ytdl-core');
 const knex = require('knex')(require('./knexfile.js').development);
 const git = require('simple-git')(__dirname);
+const cheerio = require('cheerio');
 
 //Custom modules
 const decider = require('./nifty/decisions.js')(bot); 
@@ -283,6 +284,29 @@ const commands = {
 				});
 			}
 		}
+	},
+	'invest':{
+		process:(msg)=>{
+			console.log("Invest Command Fired.");
+			try {
+				
+				var http = require('http');
+				var options = {
+					'host' : 'http://www.marketwatch.com/',
+					'port' : 80,
+					'path' : 'game/sol-investments'
+				}
+				http.get(options, function(res) {
+					console.log(res);
+					
+				})
+			}
+			catch(err){
+				msg.channel.sendMessage(err)
+			}
+			
+		},
+                description:"View SoL Investments"
 	},
 	'revoke':{
 		process: (msg) =>{
