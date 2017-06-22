@@ -330,11 +330,11 @@ http.get(options, function(res) {
     let rows = $(".rankings table tbody").first().children();
     let out = "Ranking for SoL Investments\n"+options.host+options.path+"\n"
     rows.each(function(index) {
-       let entry = $(this)
-       let rank = entry.children().eq(0).text().split(/\r?\n?\t/).join("")
-       let user = entry.children().eq(1).children().eq(0).text()
-       let balance = entry.children().eq(2).children().eq(0).text()
-      console.log(`${ rank }. ${ user }\n${ balance }`);
+      let entry = $(this)
+      let rank = entry.children().eq(0).text().split(/\r?\n?\t/).join("")
+      let user = entry.children().eq(1).children().eq(0).text()
+      let balance = entry.children().eq(2).children().eq(0).text()
+      out+= `${ rank }. ${ user }\n${ balance }\n`;
     })
     // Send this string
     msg.channel.sendMessage(out);
