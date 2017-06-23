@@ -321,7 +321,7 @@ const commands = {
               out.addField(user, balance);
             })
             // Send this string
-            msg.channel.sendMessage(out);
+            msg.channel.send({ out });
           }).on('error', function(e) {
             console.log("Got error: " + e.message);
           }); 
