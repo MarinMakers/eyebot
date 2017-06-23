@@ -289,66 +289,49 @@ const commands = {
 		process:(msg)=>{
 			console.log("Invest Command Fired.");
 			try {
-				
-				/*var http = require('http');
-				var options = {
-  host: 'www.marketwatch.com',
-  port: 80,
-  path: '/game/sol-investments'
-};
-
-http.get(options, function(res) {
-  var body = '';
-  res.on('data', function(chunk) {
-    body += chunk;
-  });
-  res.on('end', function() {
-    let $ = cheerio.load(body);
-	  console.log($)
-	  // Next time you get to a terminal, figure out which selector you need.
-  });
-}).on('error', function(e) {
-  console.log("Got error: " + e.message);
-}); */
-				
-				
 				var http = require('http')
-var cheerio = require('cheerio')
-var options = {
-  host: 'www.marketwatch.com',
-  port: 80,
-  path: '/game/sol-investments'
-};
-
-http.get(options, function(res) {
-  var body = '';
-  res.on('data', function(chunk) {
-    body += chunk;
-  });
-  res.on('end', function() {
-    let $ = cheerio.load(body);
-    let rows = $(".rankings table tbody").first().children();
-    let out = "Ranking for SoL Investments\n"+options.host+options.path+"\n"
-    rows.each(function(index) {
-      let entry = $(this)
-      let rank = entry.children().eq(0).text().split(/\r?\n?\t/).join("")
-      let user = entry.children().eq(1).children().eq(0).text()
-      let balance = entry.children().eq(2).children().eq(0).text()
-      out+= `${ rank }. ${ user }\n${ balance }\n`;
-    })
-    // Send this string
-    msg.channel.sendMessage(out);
-  }).on('error', function(e) {
-  console.log("Got error: " + e.message);
-}); 
-})
+        var cheerio = require('cheerio')
+        var options = {
+          host: 'www.marketwatch.com',
+          port: 80,
+          path: '/game/sol-investments'
+        };
+        
+        http.get(options, function(res) {
+          var body = '';
+          res.on('data', function(chunk) {
+            body += chunk;
+          });
+          res.on('end', function() {
+            let $ = cheerio.load(body);
+            let rows = $(".rankings table tbody").first().children();
+            //let out = "Ranking for SoL Investments\nhttp://"+options.host+options.path+"\n"
+            let url = "http://"+options.host+options.path;
+            let out = new Discord.RichEmbed({
+              title: "Ranking of SoL Investments",
+              color: "#cc0000",
+              url: url
+            })
+            rows.each(function(index) {
+              let entry = $(this)
+              let rank = entry.children().eq(0).text().split(/\r?\n?\t/).join("")
+              let user = entry.children().eq(1).children().eq(0).text()
+              let balance = entry.children().eq(2).children().eq(0).text()
+              //out+= `${ rank }. ${ user }\n${ balance }\n`;
+              out.addField(user, balance);
+            })
+            // Send this string
+            msg.channel.sendMessage(out);
+          }).on('error', function(e) {
+            console.log("Got error: " + e.message);
+          }); 
+        })
 			}
 			catch(err){
 				msg.channel.sendMessage(err)
 			}
-			
 		},
-                description:"View SoL Investments"
+    description:"View SoL Investments"
 	},
 	'revoke':{
 		process: (msg) =>{
