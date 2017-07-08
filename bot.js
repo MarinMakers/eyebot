@@ -22,7 +22,6 @@ const cheerio = require('cheerio');
 const decider = require('./nifty/decisions.js')(bot); 
 const todo = require('./nifty/todo.js')(bot);
 var level;
-
 //My ID ;)
 const masterID = "127060142935113728";
 
@@ -373,21 +372,28 @@ const commands = {
 			queue[msg.guild.id].playing = true;
 
 			(function play(song) {
-				console.log(song);
-				if (song === undefined) {
-					play({url:data.defaultSong});
+				queue[msg.guild.id].songs.shift();
+				if (!song) {
+					yt.getInfo(data.defaultSong, (err, info) => {
+						if(err) return msg.channel.sendMessage('Invalid YouTube Link: ' + err);
+						if (!queue.hasOwnProperty(msg.guild.id)) queue[msg.guild.id] = {}, queue[msg.guild.id].playing = false, queue[msg.guild.id].songs = [];
+						queue[msg.guild.id].defaulting = false;
+						play({url: data.defaultSong, title: info.title, requester: msg.author.username});
+					});
+					//play({url:data.defaultSong});
 					return;
 				};
-				if (!queue[msg.guild.id].looping && song.title != undefined){
+				console.log(`Playing:`,song);
+				console.log(queue);
+				if (!queue[msg.guild.id].looping && typeof(song.title) != "undefined"){
 					msg.channel.sendMessage(`Playing: **${song.title}** as requested by: **${song.requester}**`);
 				}
-				try {
+				//try {
 					dispatcher = msg.guild.voiceConnection.playStream(yt(song.url, { audioonly: true }), { passes : 1 });
-				} catch(err){
-					msg.channel.sendMessage("Issue playing music... Terminating request.");
-					return;
-				}
-				queue[msg.guild.id].songs.shift();
+				// } catch(err){
+				// 	msg.channel.sendMessage("Issue playing music... Terminating request.");
+				// 	return;
+				// }
 				let collector = msg.channel.createCollector(m => m);
 				collector.on('message', m => {
 					if (m.content.startsWith(prefix + 'pause')) {
