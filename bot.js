@@ -45,7 +45,7 @@ bot.checkRole = (msg, roleArr,ignore) => {
 }
 
 bot.reject = (msg) => {
-	msg.channel.sendCode('diff','- Access Denied\nThis incident will be reported');
+	msg.channel.send('- Access Denied\nThis incident will be reported', {"code": "diff"});
 	console.log(`${bot.timestamp()} ${msg.member.nickname} tried to use the command ${msg.cleanContent}`)
 }
 
@@ -72,7 +72,7 @@ const commands = {
 		process: (msg, argument) => {
 			// Get rid of this at some point
 			var messageFunction = (msg) => {
-				msg.channel.sendMessage(msg);
+				msg.channel.send(msg);
 			}
 
 			var method = getMethod(argument);
@@ -98,7 +98,7 @@ const commands = {
 	},
 	'ping': {
 		process: (msg, argument) => {
-			msg.channel.sendMessage(msg.author + " pong!");
+			msg.channel.send(msg.author + " pong!");
 			console.log(`${bot.timestamp()} ${msg.author.username} pinged the bot`);
 		},
 		description: "Check if the bot is online."
@@ -121,14 +121,14 @@ const commands = {
 				}
 			}
 			commandList += "```\n"+ data.musicPanel;
-			msg.author.sendMessage(commandList)
+			msg.author.send(commandList)
 		},
 		description: "Messages user list of commands"
 	},
 	'roll': {
 		process: (msg, argument) => {
 			decider.rollDice(argument, (result) => {
-				msg.channel.sendMessage(result)
+				msg.channel.send(result)
 			})
 		},
 		usage: "<d20 syntax>",
@@ -136,7 +136,7 @@ const commands = {
 	},
 	'say': {
 		process: (msg, argument) => {
-			msg.channel.sendMessage(argument);
+			msg.channel.send(argument);
 		},
 		usage: "<string>",
 		description: "Make the bot say something"
@@ -144,7 +144,7 @@ const commands = {
 	'kill': {
 		process: (msg, argument) => {
 			if (bot.checkRole(msg, ['Elder','Head Scribe'])) {
-				msg.channel.sendMessage("*Beep boop, click*").then(() => {
+				msg.channel.send("*Beep boop, click*").then(() => {
 					console.log("Being shut down by " + msg.author.username);
 					process.exit();
 				});
@@ -163,24 +163,25 @@ const commands = {
 	},
 	'enlist': {
 		process: (msg,argument) => {
-			if (bot.checkRole(msg,["Elder","Council"])) {
+			if (bot.checkRole(msg,["Council"])) {
 				if (msg.mentions.users.first() != undefined) {
 					let target = msg.guild.member(msg.mentions.users.first());
 					if (target.highestRole.name==="@everyone") {
-						target.addRole(msg.guild.roles.find("name", "Initiate").id).then((value) => {
+						target.addRoles([msg.guild.roles.find("name", "Initiate").id , msg.guild.roles.find("name", "Initiate Caste").id]).then((value) => {
 							target.setNickname(`Initiate ${target.user.username}`).then((value) => {
-								target.sendMessage("Welcome, "+ target.nickname +data.welcomeMsg);
+								console.log(target)
+								target.user.send("Welcome, "+ target.nickname +'\n\n'+data.welcomeMsg);
 							}, (reason) => {
 								console.log(reason);
 							});
-						}, (reason) => {
+						}).catch((reason) => {
 							console.log(reason);
 						});
 					}  else {
-						msg.channel.sendMessage("Target is ineligible for recruitment.")
+						msg.channel.send("Target is ineligible for recruitment.")
 					}
 				} else {
-					msg.channel.sendMessage("Mention a user to enlist.")
+					msg.channel.send("Mention a user to enlist.")
 				}
 			} else {
 				bot.reject(msg);
@@ -192,7 +193,7 @@ const commands = {
 		process: (msg,argument) => {
 			fs.readdir('./assets/images', (err, files) => {
 				if (err) {
-					msg.channel.sendMessage("No assets found.");
+					msg.channel.send("No assets found.");
 				}  else {
 					files = files.filter((file) => {
 						return file.substring(0,1) != '.';
@@ -207,7 +208,7 @@ const commands = {
 	},
 	'info': {
 		process: (msg,argument) => {
-			msg.channel.sendMessage(data.credits);
+			msg.channel.send(data.credits);
 		},
 		description: "Credits for the bot."
 	},
@@ -236,13 +237,13 @@ const commands = {
 	'update': {
 		process: (msg,argument) => {
 			if (msg.author.id === masterID) {
-				msg.channel.sendMessage("fetching updates...").then( (sentMsg) => {
+				msg.channel.send("fetching updates...").then( (sentMsg) => {
 					console.log("updating...");
 					git.pull( (err,update) => {
 						if (update && update.summary.changes) {
 							console.log("Update found")
 							sentMsg.delete().then(()=>{
-								msg.channel.sendMessage(update.summary.changes).then(()=>{
+								msg.channel.send(update.summary.changes).then(()=>{
 									process.exit(0);
 								})
 							})
@@ -289,48 +290,48 @@ const commands = {
 			console.log("Invest Command Fired.");
 			try {
 				var http = require('http')
-        var cheerio = require('cheerio')
-        var options = {
-          host: 'www.marketwatch.com',
-          port: 80,
-          path: '/game/sol-investments'
-        };
-        
-        http.get(options, function(res) {
-          var body = '';
-          res.on('data', function(chunk) {
-            body += chunk;
-          });
-          res.on('end', function() {
-            let $ = cheerio.load(body);
-            let rows = $(".rankings table tbody").first().children();
-            //let out = "Ranking for SoL Investments\nhttp://"+options.host+options.path+"\n"
-            let url = "http://"+options.host+options.path;
-            let out = new Discord.RichEmbed({
-              title: "Ranking of SoL Investments",
-              color: "#cc0000",
-              url: url
-            })
-            rows.each(function(index) {
-              let entry = $(this)
-              let rank = entry.children().eq(0).text().split(/\r?\n?\t/).join("")
-              let user = entry.children().eq(1).children().eq(0).text()
-              let balance = entry.children().eq(2).children().eq(0).text()
-              //out+= `${ rank }. ${ user }\n${ balance }\n`;
-              out.addField(user, balance);
-            })
-            // Send this string
-            msg.channel.send({ out });
-          }).on('error', function(e) {
-            console.log("Got error: " + e.message);
-          }); 
-        })
+				var cheerio = require('cheerio')
+				var address = {
+					host: 'www.marketwatch.com',
+					port: 80,
+					path: '/game/sol-investments'
+				};
+
+				http.get(address, function(res) {
+					var body = '';
+					res.on('data', function(chunk) {
+						body += chunk;
+					});
+					res.on('end', function() {
+						let $ = cheerio.load(body);
+						let rows = $(".rankings table tbody").first().children();
+						//let out = "Ranking for SoL Investments\nhttp://"+options.host+options.path+"\n"
+						let url = "http://"+options.host+options.path;
+						let out = new Discord.RichEmbed({
+							title: "Ranking of SoL Investments",
+							color: "#cc0000",
+							url: url
+						})
+						rows.each(function(index) {
+							let entry = $(this)
+							let rank = entry.children().eq(0).text().split(/\r?\n?\t/).join("")
+							let user = entry.children().eq(1).children().eq(0).text()
+							let balance = entry.children().eq(2).children().eq(0).text()
+							//out+= `${ rank }. ${ user }\n${ balance }\n`;
+							out.addField(user, balance);
+						})
+						// Send this string
+						msg.channel.send({ out });
+					}).on('error', function(e) {
+						console.log("Got error: " + e.message);
+					}); 
+				})
 			}
 			catch(err){
-				msg.channel.sendMessage(err)
+				msg.channel.send(err)
 			}
 		},
-    description:"View SoL Investments"
+		description:"View SoL Investments"
 	},
 	'revoke':{
 		process: (msg) =>{
@@ -338,12 +339,12 @@ const commands = {
 				let target = msg.guild.member(msg.mentions.users.first());
 				if (target.highestRole.name === 'Elder') {
 					msg.author.addRole(msg.guild.roles.find("name", "Blacklisted").id).then((value) =>{
-						msg.channel.sendMessage("_The bot fries your hand as you attempt this treasonous act, rendering you incapable of interacting with the bot any further_");
+						msg.channel.send("_The bot fries your hand as you attempt this treasonous act, rendering you incapable of interacting with the bot any further_");
 					})
 				} else {
 					if (bot.checkRole(msg,["Elder","Council"])) {
 						target.addRole(msg.guild.roles.find("name", "Blacklisted").id).then((value) => {
-							msg.channel.sendMessage(`${target} has had their bot privileges revoked until further notice.`)
+							msg.channel.send(`${target} has had their bot privileges revoked until further notice.`)
 						}, (reason) => {
 							console.log(reason);
 						});
@@ -352,7 +353,7 @@ const commands = {
 					}
 				}
 			} else {
-				msg.channel.sendMessage("Mention a user to revoke.")
+				msg.channel.send("Mention a user to revoke.")
 			}
 		},
 		usage:"<@target>",
@@ -360,14 +361,14 @@ const commands = {
 	},
 	'play': {
 		process: (msg) => {
-			if (queue[msg.guild.id] === undefined) return msg.channel.sendMessage(`Add some songs to the queue first with ${prefix}add`);
+			if (queue[msg.guild.id] === undefined) return msg.channel.send(`Add some songs to the queue first with ${prefix}add`);
 			if (!msg.guild.voiceConnection) {
 				return commands['join'].process(msg).then(() => {
 					commands['play'].process(msg);
 					return;
 				});
 			}
-			if (queue[msg.guild.id].playing) return msg.channel.sendMessage('Already Playing');
+			if (queue[msg.guild.id].playing) return msg.channel.send('Already Playing');
 			let dispatcher;
 			queue[msg.guild.id].playing = true;
 
@@ -375,7 +376,7 @@ const commands = {
 				queue[msg.guild.id].songs.shift();
 				if (!song) {
 					yt.getInfo(data.defaultSong, (err, info) => {
-						if(err) return msg.channel.sendMessage('Invalid YouTube Link: ' + err);
+						if(err) return msg.channel.send('Invalid YouTube Link: ' + err);
 						if (!queue.hasOwnProperty(msg.guild.id)) queue[msg.guild.id] = {}, queue[msg.guild.id].playing = false, queue[msg.guild.id].songs = [];
 						queue[msg.guild.id].defaulting = false;
 						play({url: data.defaultSong, title: info.title, requester: msg.author.username});
@@ -386,37 +387,37 @@ const commands = {
 				console.log(`Playing:`,song);
 				console.log(queue);
 				if (!queue[msg.guild.id].looping && typeof(song.title) != "undefined"){
-					msg.channel.sendMessage(`Playing: **${song.title}** as requested by: **${song.requester}**`);
+					msg.channel.send(`Playing: **${song.title}** as requested by: **${song.requester}**`);
 				}
 				//try {
 					dispatcher = msg.guild.voiceConnection.playStream(yt(song.url, { audioonly: true }), { passes : 1 });
 				// } catch(err){
-				// 	msg.channel.sendMessage("Issue playing music... Terminating request.");
+				// 	msg.channel.send("Issue playing music... Terminating request.");
 				// 	return;
 				// }
 				let collector = msg.channel.createCollector(m => m);
 				collector.on('message', m => {
 					if (m.content.startsWith(prefix + 'pause')) {
-						msg.channel.sendMessage('paused').then(() => {dispatcher.pause();});
+						msg.channel.send('paused').then(() => {dispatcher.pause();});
 					} else if (m.content.startsWith(prefix + 'resume')) {
-						msg.channel.sendMessage('resumed').then(() => {dispatcher.resume();});
+						msg.channel.send('resumed').then(() => {dispatcher.resume();});
 					} else if (m.content.startsWith(prefix + 'skip')) {
-						msg.channel.sendMessage('skipped').then(() => {
+						msg.channel.send('skipped').then(() => {
 							queue[msg.guild.id].looping=false;
 							dispatcher.end();
 						});
 					} else if (m.content.startsWith(prefix + 'volume+')) {
-						if (Math.round(dispatcher.volume*50) >= 100) return msg.channel.sendMessage(`Volume: ${Math.round(dispatcher.volume*50)}%`);
+						if (Math.round(dispatcher.volume*50) >= 100) return msg.channel.send(`Volume: ${Math.round(dispatcher.volume*50)}%`);
 						dispatcher.setVolume(Math.min((dispatcher.volume*50 + (2*(m.content.split('+').length-1)))/50,2));
-						msg.channel.sendMessage(`Volume: ${Math.round(dispatcher.volume*50)}%`);
+						msg.channel.send(`Volume: ${Math.round(dispatcher.volume*50)}%`);
 					} else if (m.content.startsWith(prefix + 'volume-')){
-						if (Math.round(dispatcher.volume*50) <= 0) return msg.channel.sendMessage(`Volume: ${Math.round(dispatcher.volume*50)}%`);
+						if (Math.round(dispatcher.volume*50) <= 0) return msg.channel.send(`Volume: ${Math.round(dispatcher.volume*50)}%`);
 						dispatcher.setVolume(Math.max((dispatcher.volume*50 - (2*(m.content.split('-').length-1)))/50,0));
-						msg.channel.sendMessage(`Volume: ${Math.round(dispatcher.volume*50)}%`);
+						msg.channel.send(`Volume: ${Math.round(dispatcher.volume*50)}%`);
 					} else if (m.content.startsWith(prefix + 'time')){
-						msg.channel.sendMessage(`time: ${Math.floor(dispatcher.time / 60000)}:${Math.floor((dispatcher.time % 60000)/1000) <10 ? '0'+Math.floor((dispatcher.time % 60000)/1000) : Math.floor((dispatcher.time % 60000)/1000)}`);
+						msg.channel.send(`time: ${Math.floor(dispatcher.time / 60000)}:${Math.floor((dispatcher.time % 60000)/1000) <10 ? '0'+Math.floor((dispatcher.time % 60000)/1000) : Math.floor((dispatcher.time % 60000)/1000)}`);
 					} else if (m.content.startsWith(prefix + 'loop')){
-						msg.channel.sendMessage(`Looping **${song.title}**. To exit loop, use ${prefix}skip`).then(() =>{queue[msg.guild.id].looping=true})
+						msg.channel.send(`Looping **${song.title}**. To exit loop, use ${prefix}skip`).then(() =>{queue[msg.guild.id].looping=true})
 					}
 				});
 				dispatcher.on('end', () => {
@@ -428,7 +429,7 @@ const commands = {
 					}
 				});
 				dispatcher.on('error', (err) => {
-					return msg.channel.sendMessage('error: ' + err).then(() => {
+					return msg.channel.send('error: ' + err).then(() => {
 						collector.stop();
 						queue[msg.guild.id].songs.shift();
 						play(queue[msg.guild.id].songs[0]);
@@ -453,13 +454,13 @@ const commands = {
 	'add': {
 		process: (msg) => {
 			let url = msg.content.split(' ')[1];
-			if (url == '' || url === undefined) return msg.channel.sendMessage(`You must add a url, or youtube video id after !add`);
+			if (url == '' || url === undefined) return msg.channel.send(`You must add a url, or youtube video id after !add`);
 			yt.getInfo(url, (err, info) => {
-				if(err) return msg.channel.sendMessage('Invalid YouTube Link: ' + err);
+				if(err) return msg.channel.send('Invalid YouTube Link: ' + err);
 				if (!queue.hasOwnProperty(msg.guild.id)) queue[msg.guild.id] = {}, queue[msg.guild.id].playing = false, queue[msg.guild.id].songs = [];
 				queue[msg.guild.id].defaulting = false;
 				queue[msg.guild.id].songs.push({url: url, title: info.title, requester: msg.author.username});
-				msg.channel.sendMessage(`added **${info.title}** to the queue`);
+				msg.channel.send(`added **${info.title}** to the queue`);
 			});
 		},
 		description: "Add youtube link to music queue.",
@@ -467,10 +468,10 @@ const commands = {
 	},
 	'queue': {
 		process: (msg) => {
-			if (queue[msg.guild.id] === undefined) return msg.channel.sendMessage(`Add some songs to the queue first with !add`);
+			if (queue[msg.guild.id] === undefined) return msg.channel.send(`Add some songs to the queue first with !add`);
 			let tosend = [];
 			queue[msg.guild.id].songs.forEach((song, i) => { tosend.push(`${i+1}. ${song.title} - Requested by: ${song.requester}`);});
-			msg.channel.sendMessage(`__**${msg.guild.name}'s Music Queue:**__ Currently **${tosend.length}** songs queued ${(tosend.length > 15 ? '*[Only next 15 shown]*' : '')}\n\`\`\`${tosend.slice(0,15).join('\n')}\`\`\``);
+			msg.channel.send(`__**${msg.guild.name}'s Music Queue:**__ Currently **${tosend.length}** songs queued ${(tosend.length > 15 ? '*[Only next 15 shown]*' : '')}\n\`\`\`${tosend.slice(0,15).join('\n')}\`\`\``);
 		},
 		description: "View music queue.",
 		discrete: true
@@ -542,8 +543,8 @@ bot.on('message', (msg) => {
 
 bot.on('guildMemberAdd', (guild, member) => {
 	console.log(`${bot.timestamp()} user ${member.user.username} joined channel.`)
-	guild.defaultChannel.sendMessage(`Outsider spotted in the area: ${member}`);
-	member.sendMessage(data.motd);
+	guild.defaultChannel.send(`Outsider spotted in the area: ${member}`);
+	member.send(data.motd);
 })
 
 // //HTTP server stuff
