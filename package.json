@@ -13,7 +13,9 @@
     "pg": "^7.4.3",
     "ytdl-core": "^0.20.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "standard": "^11.0.1"
+  },
   "scripts": {
     "start": "nodemon src/server.js",
     "test": "standard --fix"
