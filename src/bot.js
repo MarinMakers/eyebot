@@ -52,7 +52,6 @@ bot.on('message', async msg => {
     if (commands[commandToExecute]) {
       try {
         await commands[commandToExecute].process(msg, argument)
-        console.log('execution complete')
       } catch (error) {
         console.log(error)
       }
@@ -60,8 +59,9 @@ bot.on('message', async msg => {
   }
 })
 
-bot.on('guildMemberAdd', async (guild, member) => {
-  console.log(`user ${member.user.username} joined channel.`)
+bot.on('guildMemberAdd', async member => {
+  const guild = member.guild
+  console.log(`user ${member.user.username} joined ${guild.name}.`)
   await level.addUser(guild.id, member.id)
   guild.defaultChannel.send(`Outsider spotted in the area: ${member}`)
 })
