@@ -1,16 +1,16 @@
 const commands = {
-  'ping': require('./ping'),
-  'help': require('./help'),
-  'say': require('./say'),
-  'reboot': require('./reboot'),
-  'enlist': require('./enlist'),
-  'propaganda': require('./propaganda'),
-  'info': require('./info'),
-  'level': require('./level'),
-  'xp': require('./xp'),
-  'xplu': require('./xplu'),
-  'revoke': require('./revoke'),
-  'forceadd': require('./forceadd')
+  'ping': Object.assign({}, require('./ping')),
+  'help': Object.assign({}, require('./help')),
+  'say': Object.assign({}, require('./say')),
+  'reboot': Object.assign({}, require('./reboot')),
+  'enlist': Object.assign({}, require('./enlist')),
+  'propaganda': Object.assign({}, require('./propaganda')),
+  'info': Object.assign({}, require('./info')),
+  'level': Object.assign({}, require('./level')),
+  'xp': Object.assign({}, require('./xp')),
+  'xplu': Object.assign({}, require('./xplu')),
+  'revoke': Object.assign({}, require('./revoke')),
+  'forceadd': Object.assign({}, require('./forceadd'))
 }
 
 module.exports = commands

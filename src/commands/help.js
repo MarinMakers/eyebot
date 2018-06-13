@@ -1,9 +1,10 @@
-const commands = require('../commands')
+// const commands = require('../commands')
 const { prefix } = require('../constants')
 
 module.exports = {
   description: 'Messages user list of commands',
-  process: msg => {
+  process: async msg => {
+    const commands = require('../commands')
     let commandList = 'Available Commands:```'
     for (const cmd in commands) {
       if (!commands[cmd].discrete) {

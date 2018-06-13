@@ -1,7 +1,7 @@
 const level = require('../helpers/level')
 
 module.exports = {
-  process: (msg, argument) => {
-    level.lookUpID(msg, argument)
+  process: async (msg, argument) => {
+    await level.lookUpID(msg, argument)
   }
 }

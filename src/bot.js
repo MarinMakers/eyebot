@@ -7,13 +7,13 @@ const { prefix } = require('./constants')
 const commands = require('./commands')
 
 // bot methods
-bot.checkRole = (msg, roleArr) => {
+bot.checkRole = async (msg, roleArr) => {
   if (msg.author.id === masterID) return true
-  for (var i = roleArr.length - 1; i >= 0; i--) {
+  for (let i = roleArr.length - 1; i >= 0; i--) {
     if (msg.guild.roles.find('name', roleArr[i]) !== undefined) {
       let foundRole = msg.guild.roles.find('name', roleArr[i])
       if (msg.member.roles.has(foundRole.id)) {
-        console.log(`${msg.author.username} has role ${roleArr[i]}`)
+        await console.log(`${msg.author.username} has role ${roleArr[i]}`)
         return true
       }
     } else {
@@ -26,33 +26,33 @@ bot.checkRole = (msg, roleArr) => {
 
 bot.on('ready', async () => {
   await bot.user.setStatus(`online`, `Say ${prefix}help`)
-  console.log(`Eyebot Online`)
-  let guildArr = bot.guilds.array()
-  // Join the last channel of every guild that the bot is in.
+  console.log(`DUST-3 Online`)
+  let guildArr = await bot.guilds.array()
   console.log(`Joined servers: ${guildArr.length}`)
   for (const guild of guildArr) {
-    console.log(`\t${guild.name}`)
+    console.log(` - ${guild.name}`)
   }
 })
 
 bot.on('message', async msg => {
   // if not something the bot cares about, exit out
-  if (msg.author.bot || msg.system || msg.tts || msg.channel.type === 'dm' || bot.checkRole(msg, ['Blacklisted'], true)) return
+  if (msg.author.bot || msg.system || msg.tts || msg.channel.type === 'dm') return
+
+  console.log(msg.content)
   if (!msg.content.startsWith(prefix)) {
     // once every x minutes, give poster y xp
-    return level.msgXp(msg, 5, 3)
+    return level.msgXp(msg, 0, 3)
   } else {
     // Trim the mention from the message and any whitespace
     let command = msg.content.substring(msg.content.indexOf(prefix), msg.content.length).trim()
     if (command.startsWith(prefix)) {
       const queryArr = command.split(prefix).slice(1).join().split(' ')
-      // Get command to execute
       let commandToExecute = queryArr.pop()
-      // Get string after command
       let argument = queryArr.join(' ')
       if (commands[commandToExecute]) {
         try {
-          commands[commandToExecute].process(msg, argument)
+          await commands[commandToExecute].process(msg, argument)
+          console.log('execution complete')
         } catch (error) {
           console.log(error)
         }
@@ -61,8 +61,9 @@ bot.on('message', async msg => {
   }
 })
 
-bot.on('guildMemberAdd', (guild, member) => {
+bot.on('guildMemberAdd', async (guild, member) => {
   console.log(`user ${member.user.username} joined channel.`)
+  await level.addUser(guild.id, member.id)
   guild.defaultChannel.send(`Outsider spotted in the area: ${member}`)
 })
 

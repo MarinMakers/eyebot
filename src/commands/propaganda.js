@@ -4,7 +4,7 @@ const path = require('path')
 
 module.exports = {
   description: 'Display a piece of BoS propaganda.',
-  process: msg => {
+  process: async msg => {
     const imagesPath = '../../public/images/propaganda'
     fs.readdir(imagesPath, (err, files) => {
       if (err) return msg.channel.send('No assets found.')
