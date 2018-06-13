@@ -1,5 +1,5 @@
 # Eyebot
-A chatbot for the [Brotherhood of Steel Discord Server](https://discord.gg/xsUX6Ug)
+A chatbot for the [Brotherhood of Steel Discord Server](https://discord.gg/ZjWQwuv)
 
 ## Table of Contents:
 1. [Planned Features](#planned-features)
@@ -9,7 +9,7 @@ A chatbot for the [Brotherhood of Steel Discord Server](https://discord.gg/xsUX6
 
 ### Planned Features
  - [x] !propaganda - Posts misc Brotherhood of Steel propaganda
- - [x] Music functionality
+ - [ ] Music functionality
  - [ ] !file - pseudo-CLI to view contents and open resources like chat logs and reading material.
  
 ### Contributing
