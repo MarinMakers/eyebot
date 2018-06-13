@@ -1,4 +1,4 @@
-# Eyebot
+# DUST-3
 A chatbot for the [Brotherhood of Steel Discord Server](https://discord.gg/ZjWQwuv)
 
 ## Table of Contents:
