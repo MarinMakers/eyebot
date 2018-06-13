@@ -1,9 +1,0 @@
-{
-	"prefix":"!",
-	"motd": "Welcome to Sons of Liberty Gaming. If you're here to enlist, get to know the guys in #pub-talk.\nIf you'd like to challenge the guild, reach out to one of the Heads.\n\nBe sure to read the #rules. They're fairly straightforward.",
-	"musicPanel": "Music Controls:```xl\n!join : Join Voice channel of msg sender\n!add : Add a valid youtube link to the queue\n!queue : Shows the current queue, up to 15 songs shown\n!play : Play the music queue if already joined to a voice channel \n```The following commands only function while the play command is running:```xl\n!pause : pauses the music\n!resume : resumes the music\n!skip : skips the playing song\n!time : Shows the playtime of the song.\n!volume+(+++) : increases volume by 2%/+\n!volume-(---) : decreases volume by 2%/-\n!loop : loop current song```",
-	"blacklistedRoles":["@everyone"],
-	"defaultSong": "https://www.youtube.com/watch?v=trZlvpLihHk",
-	"credits": "```This bot was written by MindFlayer, with Sons of Liberty Gaming.```",
-	"welcomeMsg":"\nPlease tour our facilities. Don't hesitate to ask for help if you need it.\nGeneral group chat can be found in #general.\nFor the latest quests, check the quests channel. To find the most recent copy of the questbook, check the pinned messages.\n\nYou are currently an Initiate. Reach Level 3 to become a Senior Initiate, then Level 5 to graduate to Apprentice Knight."
-}
