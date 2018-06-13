@@ -1,7 +1,6 @@
 const bot = require('../bot.js')
 const knex = require('../utils/database')
 const first = require('lodash.first')
-const moment = require('moment')
 
 // input level integer, output base xp amount
 const xpCost = level => 25 * (3 * level + 2) * (level - 1)
@@ -19,13 +18,13 @@ const xpRemainder = xp => xp - xpCost(quadratic(xp))
 
 // Retrieve info based on your character
 var get = async msg => {
-  const rows = await knex.select('*').from('users').where({
+  const users = await knex.select('*').from('users').where({
     'user_id': msg.author.id,
     'server_id': msg.guild.id
   })
-  if (rows.length > 0) {
-    let entry = rows[0]
-    let xp = entry.message_xp + entry.quest_xp
+  const user = first(users)
+  if (user) {
+    let xp = user.message_xp + user.quest_xp
     let level = quadratic(xp)
     await msg.channel.send(`${msg.member}: **Level ${level}** - **${xpRemainder(xp)}/${xpCost(level + 1) - xpCost(level)} XP**`)
   } else {
@@ -36,24 +35,23 @@ var get = async msg => {
 
 // Give small amount of XP every amount of time
 const msgXp = async (msg, minutes, amount) => {
-  const rows = await knex.select('*').from('users').where({
+  const users = await knex.select('*').from('users').where({
     'user_id': msg.author.id,
     'server_id': msg.guild.id
   })
-  console.log(rows)
-  if (rows.length > 0) {
-    let entry = rows[0]
-    if ((new Date() - new Date(entry.last_msg)) < (60000 * minutes)) return
+  const user = first(users)
+  if (user) {
+    if ((new Date() - new Date(user.last_msg)) < (60000 * minutes)) return
 
-    let xp = entry.message_xp + entry.quest_xp
+    let xp = user.message_xp + user.quest_xp
     let newXp = xp + amount
 
     if (quadratic(xp) < quadratic(newXp)) {
       msg.channel.send(`${msg.author} increased to **Level ${quadratic(newXp)}!**`)
       console.log(`${bot.timestamp()} ${msg.member.nickname} grew to level ${quadratic(newXp)}`)
     }
-    await knex('users').where('id', entry.id).update({
-      message_xp: entry.message_xp + amount,
+    await knex('users').where('id', user.id).update({
+      message_xp: user.message_xp + amount,
       last_msg: new Date()
     })
   } else {
@@ -99,13 +97,13 @@ const lookUpID = async (msg, argument) => {
       'user_id': argument,
       'server_id': msg.guild.id
     })
-  if (users.length > 0) {
+  const user = first(users)
+  if (user) {
     try {
-      let entry = users[0]
-      let target = bot.users.get(entry.user_id)
-      let xp = entry.quest_xp + entry.message_xp
+      let target = bot.users.get(user.user_id)
+      let xp = user.quest_xp + user.message_xp
       let level = quadratic(xp)
-      await msg.channel.send(`${target.username}\n**Level ${level}** - **${xpRemainder(xp)}/${xpCost(level + 1) - xpCost(level)} XP**\nMessage XP: ${entry.message_xp}\nQuest XP: ${entry.quest_xp}`)
+      await msg.channel.send(`${target.username}\n**Level ${level}** - **${xpRemainder(xp)}/${xpCost(level + 1) - xpCost(level)} XP**\nMessage XP: ${user.message_xp}\nQuest XP: ${user.quest_xp}`)
     } catch (err) {
       await msg.channel.send(err)
     }
@@ -119,14 +117,14 @@ const addUser = async (userId, serverId) => {
     .select('id')
     .from('users')
     .where({'user_id': userId, 'server_id': serverId})
-  if (users.length > 0) {
-    console.log('Adding user ', userId)
+  const user = first(users)
+  if (!user) {
     await knex('users').insert({
       'user_id': userId,
       'server_id': serverId,
       'quest_xp': 0,
       'message_xp': 0,
-      'last_msg': moment.now()
+      'last_msg': new Date()
     })
   } else {
     return false

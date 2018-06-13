@@ -27,11 +27,13 @@ bot.checkRole = async (msg, roleArr) => {
 bot.on('ready', async () => {
   await bot.user.setStatus(`online`, `Say ${prefix}help`)
   console.log(`DUST-3 Online`)
-  let guildArr = await bot.guilds.array()
-  console.log(`Joined servers: ${guildArr.length}`)
-  for (const guild of guildArr) {
-    console.log(` - ${guild.name}`)
-  }
+  const guilds = await bot.guilds.array()
+  console.log(`Joined servers: ${guilds.length}`)
+  const promises = guilds.map(async guild => {
+    const members = guild.members.array()
+    return members.map(async member => level.addUser(member.user.id, guild.id))
+  })
+  await Promise.all(promises)
 })
 
 bot.on('message', async msg => {
@@ -39,23 +41,21 @@ bot.on('message', async msg => {
   if (msg.author.bot || msg.system || msg.tts || msg.channel.type === 'dm') return
 
   console.log(msg.content)
-  if (!msg.content.startsWith(prefix)) {
-    // once every x minutes, give poster y xp
-    return level.msgXp(msg, 0, 3)
-  } else {
-    // Trim the mention from the message and any whitespace
-    let command = msg.content.substring(msg.content.indexOf(prefix), msg.content.length).trim()
-    if (command.startsWith(prefix)) {
-      const queryArr = command.split(prefix).slice(1).join().split(' ')
-      let commandToExecute = queryArr.pop()
-      let argument = queryArr.join(' ')
-      if (commands[commandToExecute]) {
-        try {
-          await commands[commandToExecute].process(msg, argument)
-          console.log('execution complete')
-        } catch (error) {
-          console.log(error)
-        }
+  // once every x minutes, give poster y xp
+  if (!msg.content.startsWith(prefix)) return level.msgXp(msg, 0, 3)
+
+  // Trim the mention from the message and any whitespace
+  let command = msg.content.substring(msg.content.indexOf(prefix), msg.content.length).trim()
+  if (command.startsWith(prefix)) {
+    const queryArr = command.split(prefix).slice(1).join().split(' ')
+    let commandToExecute = queryArr.pop()
+    let argument = queryArr.join(' ')
+    if (commands[commandToExecute]) {
+      try {
+        await commands[commandToExecute].process(msg, argument)
+        console.log('execution complete')
+      } catch (error) {
+        console.log(error)
       }
     }
   }
