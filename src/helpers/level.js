@@ -55,7 +55,6 @@ const msgXp = async (msg, minutes, amount) => {
       last_msg: new Date()
     })
   } else {
-    console.log('User not found')
     await addUser(msg.author.id, msg.guild.id)
   }
 }
