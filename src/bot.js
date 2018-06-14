@@ -61,9 +61,8 @@ bot.on('message', async msg => {
 
 bot.on('guildMemberAdd', async member => {
   const guild = member.guild
-  console.log(`user ${member.user.username} joined ${guild.name}.`)
+  console.log(`${member.user.username} joined ${guild.name}.`)
   await level.addUser(guild.id, member.id)
-  guild.defaultChannel.send(`Outsider spotted in the area: ${member}`)
 })
 
 module.exports = bot
