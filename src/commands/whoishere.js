@@ -7,8 +7,8 @@ module.exports = {
     var output ="";
     // 0 = online, 1 = offline, 2 = idle, 3=dnd
     var status = [[0,""," brother is here, ", " brothers are here, "],
-        [0,""," brother is in his bunk, ", " are in their bunk, "],
-        [0,""," brother is awaiting commands, ", " are awaiting commands, "],
+        [0,""," brother is in his bunk, ", " brothers are in their bunk, "],
+        [0,""," brother is awaiting commands, ", " brothers are awaiting commands, "],
         [0,""," brother is preoccupied", " brothers are preoccupied"]];
     // count the number of users with the specific status
     for(member = 0; member < members.length; member++) {
