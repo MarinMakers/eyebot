@@ -10,7 +10,8 @@ const commands = {
   'xp': Object.assign({}, require('./xp')),
   'xplu': Object.assign({}, require('./xplu')),
   'revoke': Object.assign({}, require('./revoke')),
-  'forceadd': Object.assign({}, require('./forceadd'))
+  'forceadd': Object.assign({}, require('./forceadd')),
+  'map': Object.assign({}, require('./map'))
 }
 
 module.exports = commands
