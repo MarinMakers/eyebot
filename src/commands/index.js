@@ -1,18 +1,19 @@
 const commands = {
-  'ping': Object.assign({}, require('./ping')),
-  'whoishere': Object.assign({}, require('./whoishere')),
-  'help': Object.assign({}, require('./help')),
-  'say': Object.assign({}, require('./say')),
-  'reboot': Object.assign({}, require('./reboot')),
-  'enlist': Object.assign({}, require('./enlist')),
-  'propaganda': Object.assign({}, require('./propaganda')),
-  'info': Object.assign({}, require('./info')),
-  'level': Object.assign({}, require('./level')),
-  'xp': Object.assign({}, require('./xp')),
-  'xplu': Object.assign({}, require('./xplu')),
-  'revoke': Object.assign({}, require('./revoke')),
-  'forceadd': Object.assign({}, require('./forceadd')),
-  'map': Object.assign({}, require('./map'))
+  'ping': require('./ping'),
+  'whoishere': require('./whoishere'),
+  'help': require('./help'),
+  'say': require('./say'),
+  'reboot': require('./reboot'),
+  'enlist': require('./enlist'),
+  'propaganda': require('./propaganda'),
+  'info': require('./info'),
+  'level': require('./level'),
+  'xp': require('./xp'),
+  'xplu': require('./xplu'),
+  'revoke': require('./revoke'),
+  'forceadd': require('./forceadd'),
+  'map': require('./map'),
+  'lint': require('./lint')
 }
 
 module.exports = commands

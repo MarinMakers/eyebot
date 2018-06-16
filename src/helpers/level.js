@@ -46,14 +46,14 @@ const msgXp = async (msg, minutes, amount) => {
     let xp = user.message_xp + user.quest_xp
     let newXp = xp + amount
 
-    if (quadratic(xp) < quadratic(newXp)) {
-      msg.channel.send(`${msg.author} increased to **Level ${quadratic(newXp)}!**`)
-      console.log(`${msg.member.nickname} grew to level ${quadratic(newXp)}`)
-    }
     await knex('users').where('id', user.id).update({
       message_xp: user.message_xp + amount,
       last_msg: new Date()
     })
+    if (quadratic(xp) < quadratic(newXp)) {
+      msg.channel.send(`${msg.author} increased to **Level ${quadratic(newXp)}!**`)
+      console.log(`${msg.member.nickname} grew to level ${quadratic(newXp)}`)
+    }
   } else {
     await addUser(msg.author.id, msg.guild.id)
   }
