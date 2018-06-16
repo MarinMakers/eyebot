@@ -49,7 +49,7 @@ module.exports = {
 
     await Promise.all(targets.map(async member => {
       await lintRank(member)
-      await xpGrandfather({member, msg})
+      // await xpGrandfather({member, msg})
     }))
     msg.channel.send('Done. Now don\'t fuck it up again :D')
   }
