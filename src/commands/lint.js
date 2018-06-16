@@ -20,8 +20,7 @@ const lintRank = async member => {
 const xpGrandfather = async ({member, msg}) => {
   const memberRank = first(await member.roles.array().filter(role => Object.keys(ranks).indexOf(role.name) !== -1))
   if (memberRank && member) {
-    console.log(memberRank)
-    if (memberRank.name !== 'Head Scribe') return
+    // if (memberRank.name !== 'Head Scribe') return
     const rankLevel = ranks[memberRank.name].acquiredAtLevel
     const user = first(await knex.select('*').from('users').where({
       'user_id': member.id,
