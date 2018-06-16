@@ -1,5 +1,6 @@
 const commands = {
   'ping': Object.assign({}, require('./ping')),
+  'whoishere': Object.assign({}, require('./whoishere')),
   'help': Object.assign({}, require('./help')),
   'say': Object.assign({}, require('./say')),
   'reboot': Object.assign({}, require('./reboot')),
