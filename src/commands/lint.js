@@ -13,7 +13,11 @@ module.exports = {
         const ranksToRemove = memberRanks
           .sort((a, b) => b.calculatedPosition - a.calculatedPosition) // Get roles in descending order
           .slice(1) // Get all entries including and after index 1
-        await member.removeRoles(ranksToRemove)
+        try {
+          await member.removeRoles(ranksToRemove)
+        } catch (err) {
+          console.log(err)
+        }
       }
     }
     msg.channel.send('Done. Now don\'t fuck it up again :D')
