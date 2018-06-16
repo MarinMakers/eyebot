@@ -1,4 +1,3 @@
-// const commands = require('../commands')
 const { prefix } = require('../constants')
 
 module.exports = {

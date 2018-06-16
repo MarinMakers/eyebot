@@ -55,6 +55,8 @@ bot.on('message', async msg => {
       } catch (error) {
         console.log(error)
       }
+    } else {
+      msg.react('🤷')
     }
   }
 })
