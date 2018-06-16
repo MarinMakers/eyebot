@@ -20,7 +20,8 @@ const lintRank = async member => {
 const xpGrandfather = async ({member, msg}) => {
   const memberRank = first(await member.roles.array().filter(role => Object.keys(ranks).indexOf(role.name) !== -1))
   if (memberRank && member) {
-    if (ranks[memberRank.name] !== 'Head Scribe') return
+    console.log(memberRank)
+    if (memberRank.name !== 'Head Scribe') return
     const rankLevel = ranks[memberRank.name].acquiredAtLevel
     const user = first(await knex.select('*').from('users').where({
       'user_id': member.id,
@@ -34,7 +35,7 @@ const xpGrandfather = async ({member, msg}) => {
     })
     if (quadratic(xp) < quadratic(newXp)) {
       msg.channel.send(`${member} increased to **Level ${quadratic(newXp)}!**`)
-      console.log(`${msg.member.nickname} grew to level ${quadratic(newXp)}`)
+      console.log(`${member.nickname} grew to level ${quadratic(newXp)}`)
     }
   }
 }
