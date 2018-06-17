@@ -11,7 +11,9 @@ const commands = {
   'xplu': require('./xplu'),
   'revoke': require('./revoke'),
   'map': require('./map'),
-  'lint': require('./lint')
+  'lint': require('./lint'),
+  'lockch': require('./lockch'),
+  'unlockch': require('./unlockch')
 }
 
 module.exports = commands
