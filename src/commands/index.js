@@ -2,7 +2,6 @@ const commands = {
   'ping': require('./ping'),
   'whoishere': require('./whoishere'),
   'help': require('./help'),
-  'say': require('./say'),
   'reboot': require('./reboot'),
   'enlist': require('./enlist'),
   'propaganda': require('./propaganda'),
