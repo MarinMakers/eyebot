@@ -1,15 +1,13 @@
-const bot = require('../bot')
-const level = require('../helpers/level')
+const { level, checkRole } = require('../helpers')
 
 module.exports = {
   description: 'Give XP to a user. Need permissions.',
   usage: '@<username> <#>',
   process: async (msg, argument) => {
-    if (await bot.checkRole(msg, ['Elder', 'Council'])) {
+    if (await checkRole(msg, ['Elder', 'Star Paladin'])) {
       await level.give(msg, argument)
-    } 
-    else {
-      await bot.reject(msg)
+    } else {
+      await console.log(`${msg.author.username} tried to use a command without privs`)
     }
   }
 }

@@ -10,7 +10,6 @@ const commands = {
   'xp': require('./xp'),
   'xplu': require('./xplu'),
   'revoke': require('./revoke'),
-  'forceadd': require('./forceadd'),
   'map': require('./map'),
   'lint': require('./lint')
 }

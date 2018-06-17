@@ -1,11 +1,9 @@
 const Discord = require('discord.js')
 const bot = new Discord.Client()
 
-var level = require('./helpers/level')
-const masterID = '127060142935113728'
 const { prefix } = require('./constants')
-//additional botfunctions in rolechecker.js, probably rename at a later time
-const roleChecker = require('./constants/rolechecker');
+// additional botfunctions in rolechecker.js, probably rename at a later time
+const { level } = require('./helpers')
 const commands = require('./commands')
 
 // bot methods
