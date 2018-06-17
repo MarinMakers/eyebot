@@ -1,4 +1,3 @@
-const bot = require('../bot.js')
 const knex = require('../utils/database')
 const first = require('lodash.first')
 
@@ -67,14 +66,17 @@ const give = async (msg, argument) => {
     'user_id': target.id,
     'server_id': msg.guild.id
   })
-  if (users.length > 0) {
-    let user = first(users)
-    let tempArr = msg.content.trim().split(' ')
+  let user = first(users)
+  if (user) {
+    let tempArr = argument.trim().split(' ')
     let xpAmount = parseInt(tempArr[tempArr.length - 1])
     let oldTotalXp = user.quest_xp + user.message_xp
-    let newQuestXp = user.quest_xp + xpAmount
-    let newTotalXp = newQuestXp + user.message_xp
-
+    let newQuestXp = (user.quest_xp + xpAmount > 0)
+      ? user.quest_xp + xpAmount
+      : 0
+    let newTotalXp = (newQuestXp + user.message_xp > 0)
+      ? newQuestXp + user.message_xp
+      : 0
     if (quadratic(oldTotalXp) < quadratic(newTotalXp)) {
       await msg.channel.send(`${target} increased to **Level ${quadratic(newTotalXp)}!**`)
       console.log(`${target} grew to level ${quadratic(newTotalXp)}`)
@@ -83,8 +85,7 @@ const give = async (msg, argument) => {
     await knex('users').where('id', user.id).update({
       quest_xp: newQuestXp
     })
-    const statusMessage = await msg.channel.send(`${xpAmount}xp given to ${msg.mentions.users.first().username}`)
-    setTimeout(statusMessage.delete(), 3000)
+    await msg.channel.send(`${xpAmount}xp given to ${msg.mentions.users.first().username}`)
   }
 }
 
@@ -99,11 +100,13 @@ const lookUpID = async (msg, argument) => {
   const user = first(users)
   if (user) {
     try {
+      const bot = require('../bot.js')
       let target = bot.users.get(user.user_id)
       let xp = user.quest_xp + user.message_xp
       let level = quadratic(xp)
       await msg.channel.send(`${target.username}\n**Level ${level}** - **${xpRemainder(xp)}/${xpCost(level + 1) - xpCost(level)} XP**\nMessage XP: ${user.message_xp}\nQuest XP: ${user.quest_xp}`)
     } catch (err) {
+      console.log(err)
       await msg.channel.send(err)
     }
   } else {

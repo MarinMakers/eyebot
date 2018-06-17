@@ -1,13 +1,11 @@
-const bot = require('../bot')
-
-bot.checkRole = async (msg, roleArr) => {
+const checkRole = async (msg, roleArr) => {
   var authorRoles = []
-  roleArr.forEach(async role => {
-    if (await msg.guild.roles.find('name', role)) {
-      let foundRole = await msg.guild.roles.find('name', role)
-      if (await msg.member.roles.has(foundRole.id)) authorRoles.push(foundRole.name)
+  await Promise.all(roleArr.map(async role => {
+    let targetRole = await msg.guild.roles.find('name', role)
+    if (targetRole) {
+      if (await msg.member.roles.has(targetRole.id)) authorRoles.push(targetRole.name)
     }
-  })
+  }))
 
   const hasRole = (authorRoles.length > 0)
   console.log(hasRole
@@ -16,3 +14,5 @@ bot.checkRole = async (msg, roleArr) => {
 
   return hasRole
 }
+
+module.exports = checkRole
