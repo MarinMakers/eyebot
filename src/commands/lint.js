@@ -17,7 +17,7 @@ const lintRank = async member => {
   } else return member
 }
 
-const xpGrandfather = async ({member, msg}) => {
+const xpGrandfather = async ({ member, msg }) => {
   const memberRank = first(await member.roles.array().filter(role => Object.keys(ranks).indexOf(role.name) !== -1))
   if (memberRank && member) {
     // if (memberRank.name !== 'Head Scribe') return
@@ -34,7 +34,7 @@ const xpGrandfather = async ({member, msg}) => {
     })
     if (quadratic(xp) < quadratic(newXp)) {
       msg.channel.send(`${member} increased to **Level ${quadratic(newXp)}!**`)
-      console.log(`${member.nickname} grew to level ${quadratic(newXp)}`)
+      console.log(`${member.nickname || member.user.username} grew to level ${quadratic(newXp)}`)
     }
   }
 }
@@ -48,9 +48,9 @@ module.exports = {
       : msg.guild.members.array()
 
     await Promise.all(targets.map(async member => {
-      await lintRank(member)
-      // await xpGrandfather({member, msg})
+      if (argument === 'role') await lintRank(member)
+      if (argument === 'levels') await xpGrandfather({member, msg})
     }))
-    msg.channel.send('Done. Now don\'t fuck it up again :D')
+    msg.channel.send('Done. :D')
   }
 }

@@ -1,33 +1,33 @@
-const bot = require('../bot')
-
 module.exports = {
   description: 'Check how many users have which status.',
   process: async msg => {
-    var members = await msg.guild.members.array();
-    var output ="";
-    // 0 = online, 1 = offline, 2 = idle, 3=dnd
-    var status = [[0,""," brother is here, ", " brothers are here, "],
-        [0,""," brother is in his bunk, ", " brothers are in their bunk, "],
-        [0,""," brother is awaiting commands, ", " brothers are awaiting commands, "],
-        [0,""," brother is preoccupied", " brothers are preoccupied"]];
-    // count the number of users with the specific status
-    for(member = 0; member < members.length; member++) {
-        if(members[member].presence.status=="online") {status[0][0]++}
-        if(members[member].presence.status=="offline") {status[1][0]++}
-        if(members[member].presence.status=="idle") {status[2][0]++}
-        if(members[member].presence.status=="dnd") {status[3][0]++}
-    }
-    // select the correct string (singular/plural) for output and put the strings together
-    var debugcount = 0;
-    status.forEach(function(state) {
-        if(state[0] == 0) { state[0] = "none of your"; state[1] = state[3] }
-        if(state[0] == 1) { state[1] = state[2] }
-        if(state[0] > 1) { state[1] = state[3] }
-        output = output + state[0] + state[1];
-        output.charAt(0).toUpperCase();
-    })
+    const members = await msg.guild.members.array()
 
-    await msg.channel.send(output)
-    await console.log(`${msg.author.username} looked around`)
+    const status = {
+      'online': 0,
+      'offline': 0,
+      'idle': 0,
+      'dnd': 0
+    }
+    // count the number of users with the specific status
+    members.forEach(member => { status[member.presence.status]++ })
+
+    const outputArr = []
+    // select the correct string (singular/plural) for output and put the strings together
+    if (status['online']) {
+      outputArr.push(`${status['online']} ${status['online'] > 1 ? 'brothers are here' : 'brother is here'}`)
+    }
+    if (status['offline']) {
+      outputArr.push(`${status['offline']} ${status['offline'] > 1 ? 'brothers are in their bunk' : 'brother is in his bunk'}`)
+    }
+    if (status['idle']) {
+      outputArr.push(`${status['idle']} ${status['idle'] > 1 ? 'brother is awaiting commands' : 'brothers are awaiting commands'}`)
+    }
+    if (status['dnd']) {
+      outputArr.push(`${status['dnd']} ${status['dnd'] > 1 ? 'brother is preoccupied' : 'brothers are preoccupied'}`)
+    }
+
+    console.log(`${msg.author.username} looked around`)
+    await msg.channel.send(outputArr.join(', '))
   }
 }

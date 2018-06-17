@@ -7,7 +7,7 @@ module.exports = {
     if (await bot.checkRole(msg, ['Head Scribe', 'Elder'])) {
       await msg.channel.send('*Beep boop, click*')
       await console.log('Being shut down by ' + msg.author.username)
-      process.exit();
+      process.exit()
     } else {
       bot.reject(msg)
     }
