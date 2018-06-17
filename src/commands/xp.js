@@ -5,8 +5,11 @@ module.exports = {
   description: 'Give XP to a user. Need permissions.',
   usage: '@<username> <#>',
   process: async (msg, argument) => {
-    if (bot.checkRole(msg, ['Elder', 'Council'])) {
+    if (await bot.checkRole(msg, ['Elder', 'Council'])) {
       await level.give(msg, argument)
-    } else bot.reject(msg)
+    } 
+    else {
+      await bot.reject(msg)
+    }
   }
 }
