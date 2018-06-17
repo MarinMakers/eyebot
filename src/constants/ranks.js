@@ -49,55 +49,55 @@ module.exports = {
   },
   'Junior Scribe': {
     name: 'Junior Scribe',
-    acquiredAtLevel: null,
+    acquiredAtLevel: 5,
     canRevokeTarget: false,
     canGrantXP: false
   },
   'Scribe': {
     name: 'Scribe',
-    acquiredAtLevel: null,
+    acquiredAtLevel: 7,
     canRevokeTarget: false,
     canGrantXP: false
   },
   'Senior Scribe': {
     name: 'Senior Scribe',
-    acquiredAtLevel: null,
+    acquiredAtLevel: 10,
     canRevokeTarget: false,
     canGrantXP: true
   },
   'Head Scribe': {
     name: 'Head Scribe',
-    acquiredAtLevel: null,
+    acquiredAtLevel: 420,
     canRevokeTarget: false,
     canGrantXP: true
   },
   'Paladin': {
     name: 'Paladin',
-    acquiredAtLevel: null,
+    acquiredAtLevel: 12,
     canRevokeTarget: false,
     canGrantXP: true
   },
   'Paladin Captain': {
     name: 'Paladin Captain',
-    acquiredAtLevel: null,
+    acquiredAtLevel: 15,
     canRevokeTarget: false,
     canGrantXP: true
   },
   'Paladin Commander': {
     name: 'Paladin Commander',
-    acquiredAtLevel: null,
+    acquiredAtLevel: 18,
     canRevokeTarget: false,
     canGrantXP: true
   },
   'Star Paladin': {
     name: 'Star Paladin',
-    acquiredAtLevel: null,
+    acquiredAtLevel: 20,
     canRevokeTarget: false,
     canGrantXP: true
   },
   'Elder': {
     name: 'Elder',
-    acquiredAtLevel: null,
+    acquiredAtLevel: 69,
     canRevokeTarget: false,
     canGrantXP: true
   }

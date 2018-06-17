@@ -135,5 +135,7 @@ module.exports = {
   give,
   msgXp,
   addUser,
-  lookUpID
+  lookUpID,
+  xpCost,
+  quadratic
 }
