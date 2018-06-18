@@ -1,5 +1,5 @@
 exports.up = (knex, Promise) => {
-    return knex.schema.createTable('guilds', (table) => {
+    return knex.schema.createTable('backup_guilds', (table) => {
       table.increments('guild_id')
       table.string('guild_snowflake')
       table.string('guild_name')
@@ -7,6 +7,6 @@ exports.up = (knex, Promise) => {
   }
   
   exports.down = (knex, Promise) => {
-    return knex.schema.dropTable('guilds')
+    return knex.schema.dropTable('backup_guilds')
   }
   

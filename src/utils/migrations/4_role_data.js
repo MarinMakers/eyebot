@@ -1,9 +1,8 @@
 
 exports.up = (knex, Promise) => {
-    return knex.schema.createTable('roles', (table) => {
+    return knex.schema.createTable('backup_roles', (table) => {
       table.increments('role_id')
-      table.integer('server_id')
-      table.dateTime('role_timestamp')
+      table.integer('role_dataset')
       table.string('role_snowflake')
       table.string('role_name')
       table.integer('role_color')
@@ -12,6 +11,6 @@ exports.up = (knex, Promise) => {
   }
   
   exports.down = (knex, Promise) => {
-    return knex.schema.dropTable('roles')
+    return knex.schema.dropTable('backup_roles')
   }
   
