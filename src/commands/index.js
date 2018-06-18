@@ -4,6 +4,7 @@ const commands = {
   'help': require('./help'),
   'reboot': require('./reboot'),
   'backup': require('./backup'),
+  'restore': require('./restore'),
   'enlist': require('./enlist'),
   'propaganda': require('./propaganda'),
   'info': require('./info'),
