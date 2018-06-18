@@ -3,6 +3,7 @@ const commands = {
   'whoishere': require('./whoishere'),
   'help': require('./help'),
   'reboot': require('./reboot'),
+  'backup': require('./backup'),
   'enlist': require('./enlist'),
   'propaganda': require('./propaganda'),
   'info': require('./info'),

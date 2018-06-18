@@ -6,7 +6,6 @@ const checkRole = async (msg, roleArr) => {
       if (await msg.member.roles.has(targetRole.id)) authorRoles.push(targetRole.name)
     }
   }))
-
   const hasRole = (authorRoles.length > 0)
   console.log(hasRole
     ? `${msg.author.username} has role(s) ${authorRoles.join(', ')}`
