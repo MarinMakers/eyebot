@@ -21,10 +21,10 @@ module.exports = {
       outputArr.push(`${status['offline']} ${status['offline'] > 1 ? 'brothers are in their bunk' : 'brother is in his bunk'}`)
     }
     if (status['idle']) {
-      outputArr.push(`${status['idle']} ${status['idle'] > 1 ? 'brother is awaiting commands' : 'brothers are awaiting commands'}`)
+      outputArr.push(`${status['idle']} ${status['idle'] > 1 ? 'brothers are awaiting commands' : 'brother is awaiting commands'}`)
     }
     if (status['dnd']) {
-      outputArr.push(`${status['dnd']} ${status['dnd'] > 1 ? 'brother is preoccupied' : 'brothers are preoccupied'}`)
+      outputArr.push(`${status['dnd']} ${status['dnd'] > 1 ? 'brothers are preoccupied' : 'brother is preoccupied'}`)
     }
 
     console.log(`${msg.author.username} looked around`)
