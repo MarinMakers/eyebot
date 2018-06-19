@@ -7,7 +7,7 @@ const lintRank = async member => {
   const memberRanks = member.roles.array().filter(role => Object.keys(ranks).indexOf(role.name) !== -1)
   if (memberRanks.length > 1) {
     const ranksToRemove = memberRanks
-      .sort((a, b) => b.calculatedPosition - a.calculatedPosition) // Get roles in descending order
+      .sort((a, b) => b.calculatedPosition - a.calculatedPosition) // Get ranks in descending order
       .slice(1) // Get all entries including and after index 1
     try {
       return member.removeRoles(ranksToRemove)
@@ -47,10 +47,19 @@ module.exports = {
       ? msg.mentions.members.array()
       : msg.guild.members.array()
 
-    await Promise.all(targets.map(async member => {
-      if (argument === 'role') await lintRank(member)
-      if (argument === 'levels') await xpGrandfather({member, msg})
-    }))
+    switch (argument) {
+      case ('ranks'): {
+        await Promise.all(targets.map(member => lintRank(member)))
+        break
+      }
+      case ('levels'): {
+        await Promise.all(targets.map(member => xpGrandfather({ member, msg })))
+        break
+      }
+      default: {
+        return msg.react('🤷')
+      }
+    }
     msg.channel.send('Done. :D')
   }
 }
