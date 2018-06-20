@@ -43,7 +43,8 @@ module.exports = {
   description: 'Lint either one user or all users',
   usage: '<target>',
   process: async (msg, argument) => {
-    const targets = msg.mentions.members.array().length > 0
+    if (await checkRole(msg, ['Head Scribe', 'Admin', 'Elder'])) {
+      const targets = msg.mentions.members.array().length > 0
       ? msg.mentions.members.array()
       : msg.guild.members.array()
 
@@ -61,5 +62,8 @@ module.exports = {
       }
     }
     msg.channel.send('Done. :D')
+    } else {
+      await console.log(`${msg.author.username} tried to use a command without privs`)
+    }
   }
 }

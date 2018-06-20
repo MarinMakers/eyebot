@@ -1,17 +1,17 @@
 const commands = {
-  'ping': require('./ping'),
-  'whoishere': require('./whoishere'),
-  'help': require('./help'),
-  'reboot': require('./reboot'),
-  'enlist': require('./enlist'),
+  'lint': require('./lint'), //privileged only
+  'xp': require('./xp'), //privileged only
+  //'revoke': require('./revoke'), //privileged, not implemented atm
+  'reboot': require('./reboot'), //privileged only
+  'enlist': require('./enlist'), // privileged only
+  'help': require('./help'), //for all users \/
+  'xplu': require('./xplu'),
   'propaganda': require('./propaganda'),
   'info': require('./info'),
   'level': require('./level'),
-  'xp': require('./xp'),
-  'xplu': require('./xplu'),
-  'revoke': require('./revoke'),
   'map': require('./map'),
-  'lint': require('./lint')
+  'ping': require('./ping'),
+  'whoishere': require('./whoishere'),
 }
 
 module.exports = commands
