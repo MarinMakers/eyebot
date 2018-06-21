@@ -7,7 +7,6 @@ module.exports = {
     if (await checkRole(msg, ['Head Scribe', 'Admin', 'Elder'])) {
       await level.give(msg, argument)
     } else {
-      await console.log(`${msg.author.username} tried to use a command without privs`)
-    }
+      }
   }
 }

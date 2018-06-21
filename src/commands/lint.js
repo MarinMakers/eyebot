@@ -1,7 +1,7 @@
 const { ranks } = require('../constants')
 const first = require('lodash.first')
 const knex = require('../utils/database')
-const { xpCost, quadratic } = require('../helpers/level')
+const { xpCost, quadratic, checkRole } = require('../helpers')
 
 const lintRank = async member => {
   const memberRanks = member.roles.array().filter(role => Object.keys(ranks).indexOf(role.name) !== -1)

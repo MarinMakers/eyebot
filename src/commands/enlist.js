@@ -1,4 +1,4 @@
-// const bot = require('../bot')
+const { level, checkRole } = require('../helpers')
 
 module.exports = {
   description: 'Enlist a new member to the faction. Requires permissions.',
